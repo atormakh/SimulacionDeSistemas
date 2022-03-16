@@ -9,7 +9,7 @@
 *.jar
 
 # Maven
-*/target/
+target/*
 */dist/
 */log/
 
