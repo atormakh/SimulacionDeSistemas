@@ -4,6 +4,7 @@ R=2
 RC=10
 BF=false
 periodic=false
+M=0
 for i in "$@"; do
   case $i in
     --N)
@@ -26,6 +27,11 @@ for i in "$@"; do
       RC=$1
       shift
       ;;
+    --M)
+      shift
+      M=$1
+      shift
+      ;;
     --periodic)
       shift
       periodic=true
@@ -40,7 +46,6 @@ for i in "$@"; do
   esac
 done
 
+java -cp target/simulacion_sistemas-1.0-SNAPSHOT.jar -DN=$N -DL=$L -DR=$R -DRC=${RC} -Dbf=${BF} -DM=${M} -Dperiodic=${periodic} cellIndexMethod.Main
 
-java -cp target/simulacion_sistemas-1.0-SNAPSHOT.jar -DN=$N -DL=$L -DR=$R -DRC=${RC} -Dbf=${BF} -Dperiodic=${periodic} cellIndexMethod.Main
-
-python3 cellIndexMethod.py
+python3 cellIndexMethod.py --M $M

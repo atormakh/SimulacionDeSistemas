@@ -16,6 +16,7 @@ public class Main {
         double L = Integer.parseInt(System.getProperty("L", "100"));
         int MAX_R = Integer.parseInt(System.getProperty("R", "2"));
         int N = Integer.parseInt(System.getProperty("N", "100"));
+        int M = Integer.parseInt(System.getProperty("M", "0"));
         double RC = Double.parseDouble(System.getProperty("RC", "40"));
         String generationOutput = System.getProperty("generation", "output.txt");
         String output = System.getProperty("output", "neighbours-output.txt");
@@ -23,7 +24,6 @@ public class Main {
         String dynamicFilePath = System.getProperty("dynamic", "dynamic-output.txt");
 
         List<Particle> particles = new ArrayList<>();
-        System.out.printf("running with RC=%.2f%n",RC);
         if (generate) {
             particles = ParticleGenerator.generate(generationOutput,N,L,MAX_R);
         } else {
@@ -63,7 +63,7 @@ public class Main {
         }
 
         long start = System.nanoTime();
-        List<ParticleWithNeighbours> particlesN = bf ? BruteForceMethod.call(particles, RC, L, periodic) : CellIndexMethod.call(particles, RC, L, periodic);
+        List<ParticleWithNeighbours> particlesN = bf ? BruteForceMethod.call(particles, RC, L, periodic) : CellIndexMethod.call(particles, RC, L, M, periodic);
         long end = System.nanoTime();
         System.out.println((bf?"Bruteforce: ":"Cell Index Method: ") + (end-start)/1000000 + "ms");
         if (particlesN == null) return;

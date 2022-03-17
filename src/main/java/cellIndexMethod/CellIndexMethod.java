@@ -26,11 +26,7 @@ public class CellIndexMethod {
                         p2.addNeighbour(p1);
                     }
                 }));
-                particles.forEach(p2 -> {
-                    if (p1 != p2) {
-                        p1.addNeighbour(p2);
-                    }
-                });
+                addSameCell(rc, p1);
 
             });
         }
@@ -52,12 +48,18 @@ public class CellIndexMethod {
                         p2.addNeighbour(p1);
                     }
                 }));
-                particles.forEach(p2 -> {
-                    if (p1 != p2) {
-                        p1.addNeighbour(p2);
-                    }
-                });
+                addSameCell(rc, p1);
 
+            });
+        }
+
+        private void addSameCell(double rc, ParticleWithNeighbours p1) {
+            particles.forEach(p2 -> {
+                if (p1 != p2) {
+                    double distance = Point2D.distance(p1.getX(), p1.getY(), p2.getX(), p2.getY()) - p1.r - p2.r;
+                    if(distance < rc)
+                        p1.addNeighbour(p2);
+                }
             });
         }
 
@@ -118,10 +120,10 @@ public class CellIndexMethod {
         }
     }
 
-    public static List<ParticleWithNeighbours> call(List<Particle> _particles, double rc, double L, boolean periodic) {
+    public static List<ParticleWithNeighbours> call(List<Particle> _particles, double rc, double L, int _M, boolean periodic) {
         Optional<Particle> max_r = _particles.stream().max(Comparator.comparing(Particle::getR));
         if (!max_r.isPresent()) return null;
-        int M = (int) (L / (rc + max_r.get().getR())) + 1;
+        int M = _M >0? _M:(int) (L / (rc + max_r.get().getR()));
         double W = 1.0f * L / M;
         Cell[][] cellMatrix = new Cell[M][M];
 

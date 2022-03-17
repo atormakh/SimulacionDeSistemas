@@ -25,6 +25,7 @@ parser.add_argument("--static", dest="static", default="static-output.txt", help
 parser.add_argument("--dynamic", dest="dynamic", default="dynamic-output.txt", help="dynamic file input")
 parser.add_argument("--neighbours", dest="neighbours", default="neighbours-output.txt", help="neighbours file input")
 parser.add_argument("--id", dest="id", default="1", type=int, help="id of particle")
+parser.add_argument("--M", dest="M", default="0", type=int, help="specify number of cells in a row")
 
 
 
@@ -84,7 +85,7 @@ idx=0
 
 max_r = max(map(lambda p: p.r,particles))
 
-M = int(L/(max_r + float(RC))) +1
+M = int(L/(max_r + float(RC))) if args.M == 0 else args.M
 w =  L/M
 
 
