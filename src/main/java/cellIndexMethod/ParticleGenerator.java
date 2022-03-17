@@ -24,12 +24,7 @@ public class ParticleGenerator implements Supplier<Particle> {
         return new Particle(Math.random()*L,Math.random()*L, Math.random()*MAX_R,id++);
     }
 
-    public static void main(String[] args) {
-        String output = System.getProperty("output","output.txt");
-        int L = Integer.parseInt(System.getProperty("L","10"));
-        int MAX_R = Integer.parseInt(System.getProperty("R","2"));
-        int N = Integer.parseInt(System.getProperty("N","10"));
-
+    public static List<Particle> generate(String output, int N, int L, double MAX_R){
         ParticleGenerator generator = new ParticleGenerator(L,MAX_R);
 
         List<Particle> particles = Stream.generate(generator).limit(N).collect(Collectors.toList());
@@ -51,6 +46,17 @@ public class ParticleGenerator implements Supplier<Particle> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return particles;
+    }
+
+    public static void main(String[] args) {
+        String output = System.getProperty("output","output.txt");
+        int L = Integer.parseInt(System.getProperty("L","10"));
+        double MAX_R = Integer.parseInt(System.getProperty("R","2"));
+        int N = Integer.parseInt(System.getProperty("N","10"));
+
+        ParticleGenerator.generate(output,N,L,MAX_R);
 
     }
 }
