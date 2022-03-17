@@ -1,8 +1,10 @@
 package cellIndexMethod;
 
 public class Particle {
-    double x,y,r;
-    long id;
+    final double x;
+    final double y;
+    final double r;
+    final long id;
 
     public Particle(double x, double y, double r, long id) {
         this.id = id;

@@ -1,5 +1,6 @@
 import argparse
 import matplotlib.pyplot as plt
+import numpy as np
 
 class Particle:
     def __init__(self):
@@ -15,6 +16,7 @@ class Particle:
 
     def draw(self):
         self.circle = plt.Circle((self.x,self.y),self.r, facecolor=self.color)
+        plt.text(self.x,self.y,str(self.id))
         plt.gca().add_patch(self.circle)
 
 
@@ -36,6 +38,7 @@ nf = open(args.neighbours,"r")
 N = int(sf.readline())
 L = int(sf.readline())
 T = float(df.readline())
+RC = nf.readline()
 
 def parse(line):
     return  line.rstrip("\n").split(" ")
@@ -53,6 +56,7 @@ for idx,data in enumerate(static):
     id = int(data[1])
     p = particlesDict[id] = particles[idx]
     p.r = float(data[0])
+    p.id=id
 
 
 for idx, d in enumerate(dynamic):
@@ -71,12 +75,19 @@ for ns in neighbours:
             p.neighbours.append(particlesDict[int(n)]) 
 
 
-plt.figure(figsize=(10,10))
+plt.figure("Cell Index Method",figsize=(10,10))
 plt.ion()
 plt.show()
 id = args.id
 first = True
 idx=0
+
+max_r = max(map(lambda p: p.r,particles))
+
+M = int(L/(max_r + float(RC))) +1
+w =  L/M
+
+
 while(True):
     particle = particlesDict[id] if first else particles[idx]
 
@@ -95,10 +106,20 @@ while(True):
     border = 2*max(map(lambda p: p.r,particles))
     plt.gca().set_ylim(-border,L+border)
     plt.gca().set_xlim(-border,L+ border)
+    plt.title("N={}   L={}   RC={}".format(N,L,RC))
+    for i in range(-1,2):
+        for j in range(-1,2):
+            circle = plt.Circle((particle.x +i*L,particle.y+j*L),float(RC)+particle.r, fill=False)
+            plt.gca().add_patch(circle)
+    
+    plt.gca().set_xticks(np.arange(0,L+w,w))
+    plt.gca().set_yticks(np.arange(0,L+w,w))
+    plt.grid()
     plt.draw()
-    if first:input("press enter to continue...")
+    input("press enter to continue...")
     plt.pause(0.5)
     plt.cla()
+
     idx = (idx+1)%N
     first = False
 

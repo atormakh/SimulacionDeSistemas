@@ -24,7 +24,7 @@ public class ParticleGenerator implements Supplier<Particle> {
         return new Particle(Math.random()*L,Math.random()*L, Math.random()*MAX_R,id++);
     }
 
-    public static List<Particle> generate(String output, int N, int L, double MAX_R){
+    public static List<Particle> generate(String output, int N, double L, double MAX_R){
         ParticleGenerator generator = new ParticleGenerator(L,MAX_R);
 
         List<Particle> particles = Stream.generate(generator).limit(N).collect(Collectors.toList());
@@ -33,7 +33,7 @@ public class ParticleGenerator implements Supplier<Particle> {
             FileWriter staticFile = new FileWriter("static-" + output);
             FileWriter dynamicFile = new FileWriter("dynamic-" + output);
             staticFile.write(String.format("%d\n",N));
-            staticFile.write(String.format("%d\n",L));
+            staticFile.write(String.format("%.2f\n",L));
             dynamicFile.write("0\n");
 
             for(Particle p : particles){
