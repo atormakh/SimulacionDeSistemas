@@ -127,7 +127,6 @@ public class CellIndexMethod {
         double W = 1.0f * L / M;
         Cell[][] cellMatrix = new Cell[M][M];
 
-
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < M; j++) {
                 cellMatrix[j][i] = new Cell();
@@ -137,6 +136,8 @@ public class CellIndexMethod {
         particles.forEach(p -> {
             int x = (int) (p.getX() / W);
             int y = (int) (p.getY() / W);
+            if(x == M) x = M-1; // if L=100 and px = 100 then x will be out of range
+            if(y == M) y = M-1;
             cellMatrix[y][x].add(p);
         });
 

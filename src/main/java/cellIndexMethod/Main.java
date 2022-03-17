@@ -14,7 +14,7 @@ public class Main {
         boolean periodic = Boolean.parseBoolean(System.getProperty("periodic", "false"));
         boolean bf = Boolean.parseBoolean(System.getProperty("bf", "false"));
         double L = Integer.parseInt(System.getProperty("L", "100"));
-        int MAX_R = Integer.parseInt(System.getProperty("R", "2"));
+        double MAX_R = Double.parseDouble(System.getProperty("R", "2"));
         int N = Integer.parseInt(System.getProperty("N", "100"));
         int M = Integer.parseInt(System.getProperty("M", "0"));
         double RC = Double.parseDouble(System.getProperty("RC", "40"));
