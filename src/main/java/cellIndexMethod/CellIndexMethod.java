@@ -123,7 +123,8 @@ public class CellIndexMethod {
     public static List<ParticleWithNeighbours> call(List<Particle> _particles, double rc, double L, int _M, boolean periodic) {
         Optional<Particle> max_r = _particles.stream().max(Comparator.comparing(Particle::getR));
         if (!max_r.isPresent()) return null;
-        int M = _M >0? _M:(int) (L / (rc + max_r.get().getR()));
+        _M = _M >0? _M:(int) (L / (rc + max_r.get().getR()));
+        int M = _M==0? 1: _M;
         double W = 1.0f * L / M;
         Cell[][] cellMatrix = new Cell[M][M];
 

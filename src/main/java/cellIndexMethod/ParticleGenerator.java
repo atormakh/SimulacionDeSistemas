@@ -3,6 +3,7 @@ package cellIndexMethod;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,13 +33,13 @@ public class ParticleGenerator implements Supplier<Particle> {
         try {
             FileWriter staticFile = new FileWriter("static-" + output);
             FileWriter dynamicFile = new FileWriter("dynamic-" + output);
-            staticFile.write(String.format("%d\n",N));
-            staticFile.write(String.format("%.2f\n",L));
+            staticFile.write(String.format(Locale.US,"%d\n",N));
+            staticFile.write(String.format(Locale.US,"%.2f\n",L));
             dynamicFile.write("0\n");
 
             for(Particle p : particles){
-                staticFile.write(String.format("%.2f %d\n",p.getR(),p.getId()));
-                dynamicFile.write(String.format("%.2f %.2f\n",p.getX(),p.getY()));
+                staticFile.write(String.format(Locale.US,"%.2f %d\n",p.getR(),p.getId()));
+                dynamicFile.write(String.format(Locale.US,"%.2f %.2f\n",p.getX(),p.getY()));
             }
             staticFile.close();
             dynamicFile.close();
@@ -52,9 +53,9 @@ public class ParticleGenerator implements Supplier<Particle> {
 
     public static void main(String[] args) {
         String output = System.getProperty("output","output.txt");
-        int L = Integer.parseInt(System.getProperty("L","10"));
+        int L = Integer.parseInt(System.getProperty("L","100"));
         double MAX_R = Integer.parseInt(System.getProperty("R","2"));
-        int N = Integer.parseInt(System.getProperty("N","10"));
+        int N = Integer.parseInt(System.getProperty("N","100"));
 
         ParticleGenerator.generate(output,N,L,MAX_R);
 

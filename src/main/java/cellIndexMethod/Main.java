@@ -1,23 +1,20 @@
 package cellIndexMethod;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class Main {
 
     public static void main(String[] args) {
         boolean generate = Boolean.parseBoolean(System.getProperty("generate", "false"));
-        boolean periodic = Boolean.parseBoolean(System.getProperty("periodic", "false"));
-        boolean bf = Boolean.parseBoolean(System.getProperty("bf", "false"));
+        boolean periodic = Boolean.parseBoolean(System.getProperty("periodic", "true"));
+        boolean bf = Boolean.parseBoolean(System.getProperty("bf", "true"));
         double L = Integer.parseInt(System.getProperty("L", "100"));
         double MAX_R = Double.parseDouble(System.getProperty("R", "2"));
         int N = Integer.parseInt(System.getProperty("N", "100"));
         int M = Integer.parseInt(System.getProperty("M", "0"));
-        double RC = Double.parseDouble(System.getProperty("RC", "40"));
+        double RC = Double.parseDouble(System.getProperty("RC", "10"));
         String generationOutput = System.getProperty("generation", "output.txt");
         String output = System.getProperty("output", "neighbours-output.txt");
         String staticFilePath = System.getProperty("static", "static-output.txt");
@@ -30,6 +27,7 @@ public class Main {
             try {
                 File file = new File(staticFilePath);
                 Scanner scanner = new Scanner(file);
+                scanner.useLocale(Locale.ENGLISH);
                 ArrayList<Particle> tmp = new ArrayList<>();
                 N = scanner.nextInt();
                 L = scanner.nextDouble();
@@ -41,7 +39,7 @@ public class Main {
 
                 file = new File(dynamicFilePath);
                 scanner = new Scanner(file);
-
+                scanner.useLocale(Locale.ENGLISH);
                 scanner.nextDouble();
 
                 int i=0;
@@ -71,7 +69,7 @@ public class Main {
         FileWriter out;
         try {
             out = new FileWriter(output);
-            out.write(String.format("%.2f\n",RC));
+            out.write(String.format(Locale.US,"%.2f\n",RC));
         } catch (IOException e) {
             e.printStackTrace();
             return;

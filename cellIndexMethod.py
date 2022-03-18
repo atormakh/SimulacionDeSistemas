@@ -16,7 +16,7 @@ class Particle:
 
     def draw(self):
         self.circle = plt.Circle((self.x,self.y),self.r, facecolor=self.color)
-        plt.text(self.x,self.y,str(self.id))
+        #plt.text(self.x,self.y,str(self.id))
         plt.gca().add_patch(self.circle)
 
 
@@ -36,9 +36,9 @@ df = open(args.dynamic,"r")
 nf = open(args.neighbours,"r")
 
 
-N = int(sf.readline())
-L = int(sf.readline())
-T = float(df.readline())
+N = int(sf.readline().rstrip('\n'))
+L = int(float(sf.readline().rstrip('\n')))
+T = float(df.readline().rstrip('\n'))
 RC = nf.readline()
 
 def parse(line):
@@ -86,6 +86,8 @@ idx=0
 max_r = max(map(lambda p: p.r,particles))
 
 M = int(L/(max_r + float(RC))) if args.M == 0 else args.M
+if M == 0:
+    M = 1
 w =  L/M
 
 

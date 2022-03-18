@@ -5,6 +5,7 @@ RC=10
 BF=false
 periodic=false
 M=0
+generate=false
 for i in "$@"; do
   case $i in
     --N)
@@ -33,19 +34,24 @@ for i in "$@"; do
       shift
       ;;
     --periodic)
-      shift
       periodic=true
       shift
       ;;
+    --generate)
+          generate=true
+          shift
+          ;;
     -bf)
       BF=true
       shift
       ;;
     *)
       ;;
+
   esac
 done
 
-java -cp target/simulacion_sistemas-1.0-SNAPSHOT.jar -DN=$N -DL=$L -DR=$R -DRC=${RC} -Dbf=${BF} -DM=${M} -Dperiodic=${periodic} cellIndexMethod.Main
+
+java -cp target/simulacion_sistemas-1.0-SNAPSHOT.jar -DN=$N -DL=$L -DR=$R -DRC=${RC} -Dbf=${BF} -Dgenerate=${generate} -DM=${M} -Dperiodic=${periodic} cellIndexMethod.Main
 
 python3 cellIndexMethod.py --M $M
