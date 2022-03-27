@@ -14,8 +14,8 @@ public class Node {
             0b110110, 0b101101, 0b011011,
     };
 
-    public Node() {
-        in_state = out_state = Math.random() < 0.5 ? R : 0;
+    public Node(double random) {
+        in_state = out_state =  random < 0.5 ? R : 0;
 
     }
 

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {;
-        LatticeGas latticeGas = new LatticeGas(200,2000);
+        LatticeGas latticeGas = new LatticeGas(200,2000,50,1);
         FileWriter out = null;
         try {
             out = new FileWriter("latticeGas/latticeGas.txt");
@@ -14,7 +14,7 @@ public class Main {
             System.exit(1);
         }
         try {
-            latticeGas.run(100000, out);
+            latticeGas.run(5000, out);
             out.close();
         } catch (IOException e) {
             e.printStackTrace();

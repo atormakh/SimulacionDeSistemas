@@ -5,13 +5,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class LatticeGas {
 
     int gridSize;
     int numParticles;
-    final int holeSize = 5;
-    int directions = 6;
+    final int holeSize;
+    final int directions = 6;
+    Random random;
     Node[][] lattice;
     //   2  1
     //  3  c  0
@@ -20,20 +22,22 @@ public class LatticeGas {
 
     double[][] directionsComponent = {
             {1, 0},
-            {0.5, Math.sqrt(3) / 2},
-            {-0.5, Math.sqrt(3) / 2},
+            {1, 1},
+            {-1, 1},
             {-1, 0},
-            {-0.5, -Math.sqrt(3) / 2},
-            {0.5, -Math.sqrt(3) / 2}
+            {-1, -1},
+            {1, -1}
     };
 
     static int[][] evenDirectionsArray = {{1, 0}, {1, 1}, {0, 1}, {-1, 0}, {0, -1}, {1, -1}};
     static int[][] oddDirectionsArray = {{1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}};
 
 
-    public LatticeGas(int gridSize, int numParticles) {
+    public LatticeGas(int gridSize, int numParticles, int holeSize, int seed) {
         this.gridSize = gridSize;
         this.numParticles = numParticles;
+        this.holeSize = holeSize;
+        this.random = new Random(seed);
     }
 
     public void propagate() {
@@ -68,7 +72,7 @@ public class LatticeGas {
             }
 
         }
-        return x;
+        return x/(directions*holeSize);
     }
 
 
@@ -85,15 +89,14 @@ public class LatticeGas {
             }
         }
         System.out.println(N);
-        //return false;
-        return Math.abs(N)<=numParticles*0.1;
+        return false;
+        //return Math.abs(N)<=numParticles*0.1;
     }
 
-    public float getPercentageOfParticlesInSideA(){
+    public float countParticles(int xi, int yi, int xf, int yf) {
         int N=0;
-        for (int i = 0; i < gridSize/2; i++) {
-            for (int j = 0; j < gridSize; j++) {
-                if(i==0 || i==gridSize-1 || j==0 || j==gridSize-1 || i == gridSize/2) continue;
+        for (int i = xi; i < xf; i++) {
+            for (int j = yi; j < yf; j++) {
                 for (int k = 0; k < directions; k++) {
                     if (lattice[i][j].getOutDirection(k)) {
                         N ++;
@@ -102,7 +105,7 @@ public class LatticeGas {
             }
         }
 
-        return N*1.0f/this.numParticles;
+        return N*1.0f/numParticles;
     }
 
     public void run(long maxIterations, FileWriter out) throws IOException {
@@ -111,7 +114,7 @@ public class LatticeGas {
 
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                lattice[i][j] = new Node();
+                lattice[i][j] = new Node(random.nextDouble());
                 if (i == 0 || j == 0 || i == gridSize - 1 || j == gridSize - 1) {
                     lattice[i][j].setBoundary(true);
                 }
@@ -128,25 +131,14 @@ public class LatticeGas {
         for (int i = 0; i < numParticles; i++) {
             int x, y, direction;
             do {
-                x = (int) (Math.random() * (gridSize / 2 - 2)) + 1;
-                y = (int) (Math.random() * (gridSize - 2)) + 1;
-                direction = (int) (Math.random() * directions);
+                x = random.nextInt(gridSize/2-2) + 1;
+                y = random.nextInt(gridSize-2) + 1;
+                direction = random.nextInt(directions);
             } while (lattice[x][y].getInDirection(direction));
             lattice[x][y].setInDirection(direction, true);
         }
 
-     /*   numParticles=directions;
-        for(int i=0; i<directions; i++) {
-            lattice[gridSize / 2][gridSize / 2].setInDirection(i, true);
-        }*/
-
- /*       numParticles = 3;
-        lattice[gridSize / 2-20][gridSize / 2].setInDirection(0, true);
-        lattice[gridSize / 2+20][gridSize / 2].setInDirection(3, true);
-        lattice[gridSize/2-20][gridSize / 2-20].setInDirection(1, true);
-
-*/
-        int time_avg = 1;
+        int time_avg = 1000;
 
         List<Double> flows = new ArrayList<>();
 
@@ -154,19 +146,22 @@ public class LatticeGas {
 
         out.write(numParticles + " " + gridSize + "\n");
         int iter = 0;
-        for (iter = 0; iter < maxIterations && (!isBalanced() || iter < 1); iter++) {
+        //for (iter = 0; iter < maxIterations && (!isBalanced() || iter < 1); iter++) {
         //for (iter = 0; iter < maxIterations && flow_avg > 0; iter++) {
-            Float percentageInA = getPercentageOfParticlesInSideA()*100;
+        for (iter = 0; iter < maxIterations; iter++) {
+/*            Float percentageInA = getPercentageOfParticlesInSideA()*100;
             Float percentageInB = 100 - percentageInA;
-            System.out.println("Percentage in AvsB="+ percentageInA.toString()+"% || " + percentageInB + "%");
             flows.add(flow());
             if (iter > time_avg) {
                 flows.remove(0);
                 flow_avg = flows.stream().mapToDouble(d -> d).average().getAsDouble();
-                //System.out.println(flow_avg);
-            }
+            }*/
             propagate();
-            out.write((iter + 1) + "\n");
+
+            float a = countParticles(0,0,gridSize/2-1,gridSize);
+            float b = countParticles(gridSize/2+1,0,gridSize,gridSize);
+
+            out.write((iter + 1) + " " + flow() + " " + a + " " + b +  "\n");
             for (int i = 0; i < gridSize; i++) {
                 for (int j = 0; j < gridSize; j++) {
                     for (int k = 0; k < directions; k++) {
