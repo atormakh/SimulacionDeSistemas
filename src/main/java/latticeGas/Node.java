@@ -47,17 +47,6 @@ public class Node {
         return (in_state & (1 << direction)) != 0;
     }
 
-    public int getBits(char bits) {
-        int sum = 0;
-
-
-        while (bits != 0) {
-            if ((bits & 1) != 0)
-                sum++;
-            bits = (char) (bits >> 1);
-        }
-        return sum;
-    }
 
 
     public char rotateDirection(char bits, boolean right) {
@@ -68,19 +57,13 @@ public class Node {
         out_state = in_state;
         in_state = (char) (out_state & (R | S));
 
+        char directions = (char) (out_state & ~(S | R));
+
         if ((out_state & S) != 0) {
-            char new_state = (char) (out_state & (R | S));
-            for (int i = 0; i < 6; i++) {
-                if ((out_state & (1 << i)) != 0) {
-                    new_state |= (1 << ((i + 3) % 6));
-                }
-            }
-            out_state = new_state;
+            out_state = (char) (directions << 3 | directions >> 3);
+            out_state |= (char) (in_state & (R | S));
             return;
         }
-
-
-        char directions = (char) (out_state & ~(S | R));
 
         for (char rotation : rotations) {
             if (rotation == directions) {

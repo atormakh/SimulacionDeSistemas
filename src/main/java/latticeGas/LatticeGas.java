@@ -1,6 +1,5 @@
 package latticeGas;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -72,6 +71,24 @@ public class LatticeGas {
         return x;
     }
 
+
+    boolean isBalanced(){
+        int N=0;
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                if(i==0 || i==gridSize-1 || j==0 || j==gridSize-1 || i == gridSize/2) continue;
+                for (int k = 0; k < directions; k++) {
+                    if (lattice[i][j].getOutDirection(k)) {
+                        N += i < gridSize / 2? 1 : -1;
+                    }
+                }
+            }
+        }
+        //System.out.println(N);
+        //return false;
+        return Math.abs(N)<=numParticles*0.1;
+    }
+
     public void run(long maxIterations, FileWriter out) throws IOException {
 
         lattice = new Node[gridSize][gridSize];
@@ -86,7 +103,7 @@ public class LatticeGas {
         }
 
         //set vertical wall in the middle of the lattice with a hole
-        for (int i = 1; i < gridSize; i++) {
+        for (int i = 0; i < gridSize; i++) {
             if (i < (gridSize / 2 - holeSize / 2) || i > (gridSize / 2 + holeSize / 2))
                 lattice[gridSize / 2][i].setBoundary(true);
         }
@@ -102,11 +119,17 @@ public class LatticeGas {
             lattice[x][y].setInDirection(direction, true);
         }
 
-/*        numParticles=directions;
+     /*   numParticles=directions;
         for(int i=0; i<directions; i++) {
             lattice[gridSize / 2][gridSize / 2].setInDirection(i, true);
         }*/
 
+ /*       numParticles = 3;
+        lattice[gridSize / 2-20][gridSize / 2].setInDirection(0, true);
+        lattice[gridSize / 2+20][gridSize / 2].setInDirection(3, true);
+        lattice[gridSize/2-20][gridSize / 2-20].setInDirection(1, true);
+
+*/
         int time_avg = 100;
 
         List<Double> flows = new ArrayList<>();
@@ -115,12 +138,13 @@ public class LatticeGas {
 
         out.write(numParticles + " " + gridSize + "\n");
         int iter = 0;
+        //for (iter = 0; iter < maxIterations && (!isBalanced() || iter < 1); iter++) {
         for (iter = 0; iter < maxIterations && flow_avg > 0; iter++) {
             flows.add(flow());
             if (iter > time_avg) {
                 flows.remove(0);
                 flow_avg = flows.stream().mapToDouble(d -> d).average().getAsDouble();
-                System.out.println(flow_avg);
+                //System.out.println(flow_avg);
             }
             propagate();
             out.write((iter + 1) + "\n");

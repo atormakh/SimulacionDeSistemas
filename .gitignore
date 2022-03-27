@@ -23,3 +23,5 @@ target/*
 *.txt
 *.xyz
 *.ovito
+
+*__pycache__/*
