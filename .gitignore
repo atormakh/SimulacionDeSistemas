@@ -21,4 +21,5 @@ target/*
 *.avi
 *.mp4
 *.txt
-
+*.xyz
+*.ovito
