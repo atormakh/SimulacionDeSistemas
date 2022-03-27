@@ -89,6 +89,22 @@ public class LatticeGas {
         return Math.abs(N)<=numParticles*0.1;
     }
 
+    public float getPercentageOfParticlesInSideA(){
+        int N=0;
+        for (int i = 0; i < gridSize/2; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                if(i==0 || i==gridSize-1 || j==0 || j==gridSize-1 || i == gridSize/2) continue;
+                for (int k = 0; k < directions; k++) {
+                    if (lattice[i][j].getOutDirection(k)) {
+                        N ++;
+                    }
+                }
+            }
+        }
+
+        return N*1.0f/this.numParticles;
+    }
+
     public void run(long maxIterations, FileWriter out) throws IOException {
 
         lattice = new Node[gridSize][gridSize];
@@ -140,6 +156,9 @@ public class LatticeGas {
         int iter = 0;
         //for (iter = 0; iter < maxIterations && (!isBalanced() || iter < 1); iter++) {
         for (iter = 0; iter < maxIterations && flow_avg > 0; iter++) {
+            Float percentageInA = getPercentageOfParticlesInSideA()*100;
+            Float percentageInB = 100 - percentageInA;
+            System.out.println("Percentage in AvsB="+ percentageInA.toString()+"% || " + percentageInB + "%");
             flows.add(flow());
             if (iter > time_avg) {
                 flows.remove(0);
