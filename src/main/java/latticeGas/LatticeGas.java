@@ -10,7 +10,7 @@ public class LatticeGas {
 
     int gridSize;
     int numParticles;
-    final int holeSize = 50;
+    final int holeSize = 5;
     int directions = 6;
     Node[][] lattice;
     //   2  1
@@ -84,7 +84,7 @@ public class LatticeGas {
                 }
             }
         }
-        //System.out.println(N);
+        System.out.println(N);
         //return false;
         return Math.abs(N)<=numParticles*0.1;
     }
@@ -146,7 +146,7 @@ public class LatticeGas {
         lattice[gridSize/2-20][gridSize / 2-20].setInDirection(1, true);
 
 */
-        int time_avg = 100;
+        int time_avg = 1;
 
         List<Double> flows = new ArrayList<>();
 
@@ -154,8 +154,8 @@ public class LatticeGas {
 
         out.write(numParticles + " " + gridSize + "\n");
         int iter = 0;
-        //for (iter = 0; iter < maxIterations && (!isBalanced() || iter < 1); iter++) {
-        for (iter = 0; iter < maxIterations && flow_avg > 0; iter++) {
+        for (iter = 0; iter < maxIterations && (!isBalanced() || iter < 1); iter++) {
+        //for (iter = 0; iter < maxIterations && flow_avg > 0; iter++) {
             Float percentageInA = getPercentageOfParticlesInSideA()*100;
             Float percentageInB = 100 - percentageInA;
             System.out.println("Percentage in AvsB="+ percentageInA.toString()+"% || " + percentageInB + "%");

@@ -3,20 +3,25 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 
-directions_component = ((-1,0),(0.5,sqrt(3)/2),(-0.5,sqrt(3)/2),(-1,0),(-0.5,-sqrt(3)/2),(0.5,-sqrt(3)/2))
+directions_component = ((1,0),(0.5,sqrt(3)/2),(-0.5,sqrt(3)/2),(-1,0),(-0.5,-sqrt(3)/2),(0.5,-sqrt(3)/2))
+
 
 def fillGrid(frame, data, grid_size, AVG_GRID, AVG_T):
     grid = np.zeros((int(grid_size/AVG_GRID), int(grid_size/AVG_GRID)),dtype=object)
-    grid.fill([0,0,0])
+    
+    for x in range(int(grid_size/AVG_GRID)):
+        for y in range(int(grid_size/AVG_GRID)):
+            grid[x][y] = [0,0,0]
+    
     start = frame - AVG_T
     if start < 0:
         start = 0
     for f in range(start, frame):
         for particle in data[f]:
             x, y, dir = particle
-            grid[int(x/AVG_GRID)][int(y/AVG_GRID)][0] += 1 / (AVG_T*AVG_GRID*AVG_GRID)
-            grid[int(x/AVG_GRID)][int(y/AVG_GRID)][1] += directions_component[int(dir)][0] / (AVG_T*AVG_GRID*AVG_GRID)
-            grid[int(x/AVG_GRID)][int(y/AVG_GRID)][2] += directions_component[int(dir)][1] / (AVG_T*AVG_GRID*AVG_GRID)
+            grid[int(x/AVG_GRID)][int(y/AVG_GRID)][0]  += 1 / (AVG_T*AVG_GRID*AVG_GRID)
+            grid[int(x/AVG_GRID)][int(y/AVG_GRID)][1] += directions_component[int(dir)][0] / (AVG_GRID)
+            grid[int(x/AVG_GRID)][int(y/AVG_GRID)][2] += directions_component[int(dir)][1] / (AVG_GRID)
 
     return grid
 
@@ -75,24 +80,26 @@ def plotParticles(grid_size, data):
     plot(update, grid_size, len(data), 1)
 
 
-# def plotFlow(avg_grid, avg_t, grid_size, data):
-#     plt.figure("Lattice Gas", figsize=(10, 10))
+def plotFlow(avg_grid, avg_t, grid_size, data):
+    plt.figure("Lattice Gas", figsize=(10, 10))
 
-#     arrows = np.zeros(
-#         (int(grid_size/avg_grid), int(grid_size/avg_grid)), dtype=object)
+    arrows = np.zeros(
+        (int(grid_size/avg_grid), int(grid_size/avg_grid)), dtype=object)
 
-#     for x in range(int(grid_size/avg_grid)):
-#         for y in range(int(grid_size/avg_grid)):
-#             arrows[x][y] = plt.gca().add_line(plt.Line2D([x*avg_grid,0],[y*avg_grid,0], color='red'))
+    for x in range(int(grid_size/avg_grid)):
+        for y in range(int(grid_size/avg_grid)):
+            arrows[x][y] = plt.gca().add_line(plt.Line2D([x*avg_grid,x*avg_grid],[y*avg_grid,y*avg_grid], color='red'))
 
         
-#     def update(frame_number):
-#         print(frame_number)
-#         grid = fillGrid(frame_number, data, grid_size, avg_grid, avg_t)
-#         plt.clf()
-#         for x in range(int(grid_size/avg_grid)):
-#             for y in range(int(grid_size/avg_grid)):
-#                 arrows[x][y].set(xdata=[x*avg_grid,grid[x][y][1]], ydata=[y*avg_grid,grid[x][y][2]])
-#         return arrows.flatten()
+    def update(frame_number):
+        print(frame_number)
+        grid = fillGrid(frame_number, data, grid_size, avg_grid, avg_t)
+        for x in range(int(grid_size/avg_grid)):
+            for y in range(int(grid_size/avg_grid)):
+                dx = grid[x][y][1]
+                dy = grid[x][y][2]
+                arrows[x][y].set(xdata=[x*avg_grid,x*avg_grid+dx], ydata=[y*avg_grid,y*avg_grid+dy])
+                #arrows[x][y] = plt.gca().add_patch(plt.arrow(x*avg_grid,y*avg_grid, dx,dy, color='red'))
+        return arrows.flatten()
 
-#     plot(update, grid_size, len(data), 1)
+    plot(update, grid_size, len(data), 1)

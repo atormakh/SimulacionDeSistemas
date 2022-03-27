@@ -14,7 +14,7 @@ public class Main {
             System.exit(1);
         }
         try {
-            latticeGas.run(1000, out);
+            latticeGas.run(100000, out);
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
