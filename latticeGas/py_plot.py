@@ -2,6 +2,7 @@ from math import sqrt
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
+import sys
 
 directions_component = ((1,0),(0.5,sqrt(3)/2),(-0.5,sqrt(3)/2),(-1,0),(-0.5,-sqrt(3)/2),(0.5,-sqrt(3)/2))
 
@@ -22,18 +23,26 @@ def fillGrid( data, grid_size, AVG_GRID):
 
     return grid
 
-def plot(update, grid_size, iterations, interval=1):
+def plot(filename, update, grid_size, iterations, interval=1):
     plt.xlim(0, grid_size)
     plt.ylim(0, grid_size)
-    anim = animation.FuncAnimation(
-        plt.gcf(), update, iterations, interval=interval, blit=True)
     plt.axvline(x=grid_size/2, ymin=0, ymax=0.375, color='black')
     plt.axvline(x=grid_size/2, ymin=0.625, ymax=1, color='k')
 
-    plt.show()
-    writervideo = animation.FFMpegWriter(fps=15)
-    anim.save('lattice_gas.avi', writer=writervideo)
+    def animate(data):
+        print(data[0])
+        return update(data)
 
+    anim = animation.FuncAnimation(
+        plt.gcf(), animate, iterations, interval=interval, blit=True, save_count=sys.maxsize)
+  
+    #plt.pause(0.001)
+    #plt.show()
+
+
+
+    writervideo = animation.FFMpegWriter(fps=15)
+    anim.save(filename + '.mp4', writer=writervideo, dpi=100)
 
 def plotDensity(avg_grid, data):
     plt.figure("Lattice Gas", figsize=(10, 10))
@@ -58,7 +67,7 @@ def plotDensity(avg_grid, data):
                 squares[x][y].set_alpha(grid[x][y][0])
         return squares.flatten()
 
-    plot(update, grid_size, data, 1)
+    plot("density",update, grid_size, data, 1)
 
         
 
@@ -77,7 +86,7 @@ def plotParticles(data):
             particles[i].center = (x, y)
         return particles
 
-    plot(update, data.grid_size, data, 1)
+    plot("particles",update, data.grid_size, data, 1)
 
 
 def plotFlow(avg_grid, data):
@@ -92,20 +101,32 @@ def plotFlow(avg_grid, data):
         for y in range(int(grid_size/avg_grid)):
             arrows[x][y] = plt.gca().add_line(plt.Line2D([x*avg_grid,x*avg_grid],[y*avg_grid,y*avg_grid], color='red'))
 
-        
+    dot = plt.gca().add_patch(plt.Circle((0, 0), 0.01, fc='green'))
     def update(data):
         time, flow, a, b, _data = data
-        print(time)
+        plt.cla()
+        plt.xlim(0, grid_size)
+        plt.ylim(0, grid_size)
+        plt.axvline(x=grid_size/2, ymin=0, ymax=0.375, color='black')
+        plt.axvline(x=grid_size/2, ymin=0.625, ymax=1, color='k')
         grid = fillGrid(_data, grid_size, avg_grid)
         for x in range(int(grid_size/avg_grid)):
             for y in range(int(grid_size/avg_grid)):
                 dx = grid[x][y][1]
                 dy = grid[x][y][2]
-                arrows[x][y].set(xdata=[x*avg_grid,x*avg_grid+dx], ydata=[y*avg_grid,y*avg_grid+dy])
-                #arrows[x][y] = plt.gca().add_patch(plt.arrow(x*avg_grid,y*avg_grid, dx,dy, color='red'))
+                if dx == 0 and dy == 0:
+                    arrows[x][y] = dot
+                    #pass
+                else:
+                    len = sqrt(dx**2 + dy**2)
+                    dx = avg_grid/4 * dx/len
+                    dy = avg_grid/4 * dy/len
+                
+                    #arrows[x][y].set(xdata=[x*avg_grid,x*avg_grid+dx], ydata=[y*avg_grid,y*avg_grid+dy])
+                    arrows[x][y] = plt.gca().add_patch(plt.arrow(x*avg_grid,y*avg_grid, dx,dy,width=0.5, color='green'))
         return arrows.flatten()
 
-    plot(update, grid_size, data, 1)
+    plot("flow",update, grid_size, data, 1)
 
 
 def plotGraphs(data):
@@ -126,4 +147,5 @@ def plotGraphs(data):
     m = max(flow_avg)
     flow_avg = [ x/(2*m) + 0.5 for x in flow_avg]
     #plt.plot(flow_avg)
-    plt.show()
+    #plt.show()
+    plt.savefig("particles.png")

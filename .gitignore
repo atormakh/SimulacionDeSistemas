@@ -20,6 +20,7 @@ target/*
 
 *.avi
 *.mp4
+*.png
 *.txt
 *.xyz
 *.ovito
