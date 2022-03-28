@@ -115,16 +115,24 @@ public class LatticeGas {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 lattice[i][j] = new Node(random.nextDouble());
-                if (i == 0 || j == 0 || i == gridSize - 1 || j == gridSize - 1) {
+                if(i==0 || i==gridSize-1) {
+                    lattice[i][j].setVerticalWall(true);
                     lattice[i][j].setBoundary(true);
                 }
+                if(j==0 || j==gridSize-1) {
+                    lattice[i][j].setHorizontalWall(true);
+                    lattice[i][j].setBoundary(true);
+                }
+
             }
         }
 
         //set vertical wall in the middle of the lattice with a hole
         for (int i = 0; i < gridSize; i++) {
-            if (i < (gridSize / 2 - holeSize / 2) || i > (gridSize / 2 + holeSize / 2))
+            if (i < (gridSize / 2 - holeSize / 2) || i > (gridSize / 2 + holeSize / 2)) {
+                lattice[gridSize / 2][i].setVerticalWall(true);
                 lattice[gridSize / 2][i].setBoundary(true);
+            }
         }
 
 
@@ -160,7 +168,7 @@ public class LatticeGas {
 
             float a = countParticles(0,0,gridSize/2-1,gridSize);
             float b = countParticles(gridSize/2+1,0,gridSize,gridSize);
-
+            //System.out.println(countParticles(0,0,gridSize,gridSize));
             out.write((iter + 1) + " " + flow() + " " + a + " " + b +  "\n");
             for (int i = 0; i < gridSize; i++) {
                 for (int j = 0; j < gridSize; j++) {

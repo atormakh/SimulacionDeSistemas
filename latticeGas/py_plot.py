@@ -42,7 +42,7 @@ def plot(filename, update, grid_size, iterations, interval=1):
 
 
     writervideo = animation.FFMpegWriter(fps=15)
-    anim.save(filename + '.mp4', writer=writervideo, dpi=100)
+    anim.save(filename + '.mp4', writer=writervideo)
 
 def plotDensity(avg_grid, data):
     plt.figure("Lattice Gas", figsize=(10, 10))
