@@ -3,6 +3,7 @@ import data_import
 import py_plot, ovito
 import numpy as np
 import time, math
+
 AVG_GRID = 10
 AVG_T = 100
 
@@ -28,12 +29,10 @@ py_plot.plotGraphs(data)
 
 #py_plot.plotFlow(AVG_GRID,data)
 
+
+#ovito.generate_lattice(data.grid_size)
+#ovito.generate_wall(data.grid_size, 50)
 #ovito.save("lattice_gas.xyz",data)
 
 #print("Time:", time.time() - start)
 
-# with open("static.xyz","w") as f:
-#     f.write("{}\ncomment\n".format(200*200))
-#     for i in range(0,200):
-#         for j in range(0,200):
-#             f.write("{} {} {}\n".format(i-0.5 if j%2 else i,j*math.sqrt(3)/2,0))

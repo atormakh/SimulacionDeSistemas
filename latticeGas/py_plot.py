@@ -26,16 +26,7 @@ def fillGrid( data, grid_size, AVG_GRID):
 
     return grid
 
-def plot(filename, update, grid_size, iterations, interval=1):
-    plt.xlim(0, grid_size)
-    plt.ylim(0, grid_size)
-    plt.axvline(x=grid_size/2, ymin=0, ymax=0.375, color='black')
-    plt.axvline(x=grid_size/2, ymin=0.625, ymax=1, color='k')
-
-    def animate(data):
-        print(data[0])
-        return update(data)
-
+def save(animate, iterations,filename):
     def asyncSave(filename, frame):
         animate(frame)
         plt.savefig(filename)
@@ -57,23 +48,31 @@ def plot(filename, update, grid_size, iterations, interval=1):
         save = mp.Process(target=asyncSave, args=(file, frame))
         processes.append(save)
         save.start()
-        #animate(frame)
-        #plt.savefig("frames/"+filename + str(frame[0]) + ".png")
     
     for process in processes:
         process.join()
 
     os.system("ffmpeg -y -pattern_type glob -i 'frames/"+filename + "*.png' "+filename+".mp4")
     os.system("rm -r frames/"+filename+"*.png")
-    return 
 
+def plot(filename, update, grid_size, iterations, interval=1):
+    plt.xlim(0, grid_size)
+    plt.ylim(0, grid_size)
+    plt.axvline(x=grid_size/2, ymin=0, ymax=0.375, color='black')
+    plt.axvline(x=grid_size/2, ymin=0.625, ymax=1, color='k')
+
+    def animate(data):
+        print(data[0])
+        return update(data)
+
+    #save(animate, iterations, filename)
+    #return
+    
     anim = animation.FuncAnimation(
         plt.gcf(), animate, iterations, interval=interval, blit=True, save_count=sys.maxsize)
   
-    #plt.pause(0.001)
-    #plt.show()
-
-
+    plt.pause(0.001)
+    plt.show()
 
     writervideo = animation.FFMpegWriter(fps=15)
     anim.save(filename + '.mp4', writer=writervideo)
@@ -93,7 +92,7 @@ def plotDensity(avg_grid, data):
 
         
     def update(data):
-        time, flow, a, b, _data = data
+        time, a, b, _data = data
         grid = fillGrid(_data, grid_size, avg_grid)
 
         for x in range(int(grid_size/avg_grid)):
@@ -114,7 +113,7 @@ def plotParticles(data):
                  for i in range(num_particles)]
 
     def update(data):
-        time, flow, a, b, _data = data
+        time, a, b, _data = data
         for i in range(num_particles):
             x, y, dir = _data[-1][i]
             particles[i].center = (x, y)
@@ -137,7 +136,7 @@ def plotFlow(avg_grid, data):
 
     dot = plt.gca().add_patch(plt.Circle((0, 0), 0.01, fc='green'))
     def update(data):
-        time, flow, a, b, _data = data
+        time, a, b, _data = data
         plt.cla()
         plt.xlim(0, grid_size)
         plt.ylim(0, grid_size)
@@ -165,21 +164,12 @@ def plotFlow(avg_grid, data):
 
 def plotGraphs(data):
     count = []
-    flow = []
-    for time, f, a,b, _data in data:
-        flow.append(f)
+    for time, a,b, _data in data:
         count.append((a,b))
 
 
     plt.figure("Lattice Gas", figsize=(10, 10))
     plt.plot(count)
     
-    flow_avg = []
-    for i in range(100, len(flow)):
-        flow_avg.append(sum(flow[i-100:i])/100)
-
-    m = max(flow_avg)
-    flow_avg = [ x/(2*m) for x in flow_avg]
-    plt.plot(flow_avg)
     plt.show()
     plt.savefig("particles.png")

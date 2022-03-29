@@ -20,7 +20,7 @@ class Data:
         if not header:
             raise StopIteration
         
-        time, flow, a, b = map(float, parse(header))
+        time, a, b = map(float, parse(header))
 
 
         data = []
@@ -34,7 +34,7 @@ class Data:
         
         self.data.append(data)
 
-        return time, flow, a, b, self.data
+        return time, a, b, self.data
 
     def close(self):
         self.file.close()
