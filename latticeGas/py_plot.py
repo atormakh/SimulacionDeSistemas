@@ -166,10 +166,7 @@ def plotGraphs(data):
     count = []
     for time, a,b, _data in data:
         count.append((a,b))
-
-
     plt.figure("Lattice Gas", figsize=(10, 10))
-    plt.plot(count)
-    
+    plt.plot(count)    
     plt.show()
     plt.savefig("particles.png")
