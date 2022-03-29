@@ -8,7 +8,7 @@ public class Main {
         LatticeGas latticeGas = new LatticeGas(200,2000,50,1);
         FileWriter out = null;
         try {
-            out = new FileWriter("latticeGas/latticeGas.txt");
+            out = new FileWriter("latticeGas.txt");
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);

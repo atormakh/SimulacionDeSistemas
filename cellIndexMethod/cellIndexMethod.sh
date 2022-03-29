@@ -52,6 +52,6 @@ for i in "$@"; do
 done
 
 
-java -cp target/simulacion_sistemas-1.0-SNAPSHOT.jar -DN=$N -DL=$L -DR=$R -DRC=${RC} -Dbf=${BF} -Dgenerate=${generate} -DM=${M} -Dperiodic=${periodic} cellIndexMethod.Main
+java -cp target/cellIndexMethod-1.0-SNAPSHOT.jar -DN=$N -DL=$L -DR=$R -DRC=${RC} -Dbf=${BF} -Dgenerate=${generate} -DM=${M} -Dperiodic=${periodic} cellIndexMethod.Main
 
 python3 cellIndexMethod.py --M $M

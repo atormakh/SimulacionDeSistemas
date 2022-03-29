@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import sys
+import os
+import multiprocessing as mp
+
 
 directions_component = ((1,0),(0.5,sqrt(3)/2),(-0.5,sqrt(3)/2),(-1,0),(-0.5,-sqrt(3)/2),(0.5,-sqrt(3)/2))
 
@@ -32,6 +35,37 @@ def plot(filename, update, grid_size, iterations, interval=1):
     def animate(data):
         print(data[0])
         return update(data)
+
+    def asyncSave(filename, frame):
+        animate(frame)
+        plt.savefig(filename)
+    
+    
+    MAX_PROCESSES = mp.cpu_count()
+
+    processes = []
+    os.makedirs("frames/", exist_ok=True)
+
+    for frame in iterations:
+        
+        while len(processes) >= MAX_PROCESSES:
+            processes[0].join()
+            processes.pop(0)
+
+        frame_num = "_{:08d}".format(int(frame[0]))
+        file = "frames/"+filename +  frame_num + ".png"
+        save = mp.Process(target=asyncSave, args=(file, frame))
+        processes.append(save)
+        save.start()
+        #animate(frame)
+        #plt.savefig("frames/"+filename + str(frame[0]) + ".png")
+    
+    for process in processes:
+        process.join()
+
+    os.system("ffmpeg -y -pattern_type glob -i 'frames/"+filename + "*.png' "+filename+".mp4")
+    os.system("rm -r frames/"+filename+"*.png")
+    return 
 
     anim = animation.FuncAnimation(
         plt.gcf(), animate, iterations, interval=interval, blit=True, save_count=sys.maxsize)
@@ -145,7 +179,7 @@ def plotGraphs(data):
         flow_avg.append(sum(flow[i-100:i])/100)
 
     m = max(flow_avg)
-    flow_avg = [ x/(2*m) + 0.5 for x in flow_avg]
-    #plt.plot(flow_avg)
-    #plt.show()
+    flow_avg = [ x/(2*m) for x in flow_avg]
+    plt.plot(flow_avg)
+    plt.show()
     plt.savefig("particles.png")
