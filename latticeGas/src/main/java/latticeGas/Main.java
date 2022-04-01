@@ -9,7 +9,7 @@ public class Main {
 
         int holeSize = Integer.parseInt(System.getProperty("holeSize","50"));
         int numParticles = Integer.parseInt(System.getProperty("numParticles","2000"));
-        int seed = Integer.parseInt(System.getProperty("seed","1"));
+        int seed = Integer.parseInt(System.getProperty("seed","0"));
         float threshold = Float.parseFloat(System.getProperty("threshold","0.05"));
 
         if (seed == 0) seed = (int) (Math.random() * 1000000);

@@ -20,8 +20,8 @@ public class LatticeGas {
     //   4  5
     //
 
-    static int[][] evenDirectionsArray = {{1, 0}, {1, 1}, {0, 1}, {-1, 0}, {0, -1}, {1, -1}};
-    static int[][] oddDirectionsArray = {{1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}};
+    static int[][] oddDirectionsArray = {{1, 0}, {1, 1}, {0, 1}, {-1, 0}, {0, -1}, {1, -1}};
+    static int[][] evenDirectionsArray = {{1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}};
 
 
     public LatticeGas(int gridSize, int numParticles, int holeSize, int seed) {

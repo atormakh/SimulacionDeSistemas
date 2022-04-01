@@ -5,7 +5,7 @@ def generate_lattice(size=200):
         f.write("{}\ncomment\n".format(size*size))
         for i in range(0,size):
             for j in range(0,size):
-                f.write("{} {} {}\n".format(i-0.5 if j%2 else i,j*math.sqrt(3)/2,0))
+                f.write("{} {} {}\n".format(i if j%2 else i-0.5,j*math.sqrt(3)/2,0))
 
 def generate_wall(size=200, hole_size=50):
     with open("wall.xyz","w") as f:
@@ -13,12 +13,12 @@ def generate_wall(size=200, hole_size=50):
         i = size/2
         for j in range(0,size):
             if(j <= size/2 - hole_size/2 or j > size/2 + hole_size/2):
-                f.write("{} {} {} {}\n".format(i-0.5 if j%2 else i,j*math.sqrt(3)/2,0, 255,0,0))
+                f.write("{} {} {} {}\n".format(i if j%2 else i-0.5,j*math.sqrt(3)/2,0, 255,0,0))
         
         for i in range(0,size):
             for j in range(0,size):
                 if(i == 0 or i == size-1 or j == 0 or j == size-1):
-                    f.write("{} {} {} {}\n".format(i-0.5 if j%2 else i,j*math.sqrt(3)/2,0, 255,0,0))
+                    f.write("{} {} {} {}\n".format(i if j%2 else i-0.5,j*math.sqrt(3)/2,0, 255,0,0))
 
 
 def save(filename, data):
@@ -27,5 +27,5 @@ def save(filename, data):
             dump.write("{}\ncomment\n".format(len(frame[-1])))
             for particle in frame[-1]:
                 x,y,dir = particle
-                dump.write("{} {} {}\n".format( x-0.5 if y%2 else x, y * math.sqrt(3)/2, 0))
+                dump.write("{} {} {}\n".format( x if y%2 else x-0.5, y * math.sqrt(3)/2, 0))
     dump.close()
