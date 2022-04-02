@@ -1,3 +1,4 @@
+from cProfile import label
 import os
 import random
 import sys
@@ -12,80 +13,83 @@ import pickle
 
 os.popen("mvn package").read()
 
-seed = 2022
-random.seed(seed)
+SEED = 2023
+random.seed(SEED)
 
 N = 10
-particles = [2000, 3000, 5000]
-hole_sizes = [40, 50, 60]
+particles = [2000, 2500, 3000, 3500, 4000, 4500, 5000]
+hole_sizes = [40, 45, 50, 55, 60]
 seeds = [random.randint(1, 2**16) for _ in range(0, N)]
 
 try:
-    pickle_file = open("data.pickle","rb")
-    data = pickle.load(pickle_file)
+    pickle_file = open("cache.pickle","rb")
+    cache = pickle.load(pickle_file)
     pickle_file.close()
 except:
-    data = {}
+    cache = {}
 
 
 path = "stats_output/"
 
 os.makedirs(path, exist_ok=True)
 
+data = {}
+
 for hole_size in hole_sizes:
     for numParticles in particles:
-        if(data.get((numParticles, hole_size))):
-            continue
-        else:
-            data[(numParticles, hole_size)] = []
+        
+        data[(numParticles, hole_size)] = []
 
         for seed in seeds:
-            command = f"java -cp target/latticeGas-1.0-SNAPSHOT.jar -DnumParticles={numParticles} -DholeSize={hole_size} -Dseed={seed} latticeGas.Main "
-            print(command)
-            proc = os.popen(command)
-            data[(numParticles,hole_size)].append(proc.readline())
+            if(cache.get((numParticles, hole_size, seed))):
+                data[(numParticles, hole_size)].append(cache[(numParticles, hole_size, seed)])
+            else:
+                data[(numParticles, hole_size,seed)] = []
 
-            # data = data_import.Data("latticeGas.txt", 0)
-            # count = [(a, b) for time, a, b, frame in data]
-            # plt.figure("{} particles, hole size {}, seed {}".format(
-            #     numParticles, hole_size, seed))
-            # plt.plot(count)
-            # plt.savefig(f"{path}/{numParticles}_{hole_size}_{seed}.png")
-            # plt.close
+                command = f"java -cp target/latticeGas-1.0-SNAPSHOT.jar -DnumParticles={numParticles} -DholeSize={hole_size} -Dseed={seed} latticeGas.Main "
+                print(command)
+                proc = os.popen(command)
+                time = proc.readline()
+                data[(numParticles,hole_size)].append(time)
+                cache[(numParticles, hole_size, seed)] = time
 
-
-with open("data.pickle", "wb") as f:
-    pickle.dump(data, f)
+with open("cache.pickle", "wb") as f:
+    pickle.dump(cache, f)
     f.close()
 
-HOLE_SIZE = 50
 
-time = []
-errors = []
-for numParticles in particles:
-    times = data[(numParticles, HOLE_SIZE)]
-    time.append(statistics.mean(map(float,times)))
-    errors.append(statistics.stdev(map(float,times))/math.sqrt(len(times)))
 
 
 plt.figure("Time vs N particles")
 plt.xlabel("N particles")
 plt.ylabel("Time")
-plt.errorbar(particles, time, yerr=errors)
-plt.savefig("time_vs_N_particles.png")
-
-
-time = []
-errors = []
-NUM_PARTICLES = 3000
 for hole_size in hole_sizes:
-    times = data[(NUM_PARTICLES, hole_size)]
-    time.append(statistics.mean(map(float,times)))
-    errors.append(statistics.stdev(map(float,times))/math.sqrt(len(times)))
+    time = []
+    errors = []
+    for numParticles in particles:
+        times = data[(numParticles, hole_size)]
+        time.append(statistics.mean(map(float,times)))
+        errors.append(statistics.stdev(map(float,times))/math.sqrt(len(times)))
+    plt.errorbar(particles, time, yerr=errors, fmt="o", label=f"Hole size {hole_size}", markersize=5)
+
+
+plt.legend()
+
+
+plt.savefig("time_vs_N_particles.png")
 
 
 plt.figure("Time vs Hole size")
 plt.xlabel("Hole size")
 plt.ylabel("Time")
-plt.errorbar(hole_sizes, time, yerr=errors)
+for numParticles in particles:
+    time = []
+    errors = []
+    for hole_size in hole_sizes:
+        times = data[(numParticles, hole_size)]
+        time.append(statistics.mean(map(float,times)))
+        errors.append(statistics.stdev(map(float,times))/math.sqrt(len(times)))
+    plt.errorbar(hole_sizes, time, yerr=errors, fmt="o", label=f"N particles {numParticles}", markersize=5)
+
+plt.legend()
 plt.savefig("time_vs_holes_sizes.png")
