@@ -8,7 +8,7 @@ class Data:
     def __init__(self, filename, avg_t):
         self.avg_t = avg_t
         self.file = open(filename, 'r')
-        self.num_particles, self.grid_size = map(int, parse(self.file.readline()))
+        self.num_particles, self.grid_size, self.hole_size = map(int, parse(self.file.readline()))
         self.data = deque()
     
     

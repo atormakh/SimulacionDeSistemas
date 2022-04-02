@@ -1,11 +1,11 @@
 from matplotlib import pyplot
 import data_import
-import py_plot, ovito_export
+import py_plot, ovito_export, ovito_render
 import numpy as np
 import time, math
 
 AVG_GRID = 10
-AVG_T = 100
+AVG_T = 10
 
 def main(action):
     data = data_import.Data("latticeGas.txt", AVG_T)
@@ -14,7 +14,7 @@ def main(action):
               "density": lambda: py_plot.plotDensity(AVG_GRID, data),
               "particles": lambda: py_plot.plotParticles(data),
               "flow": lambda: py_plot.plotFlow(AVG_GRID, data),
-              "ovito": lambda: ovito.save("lattice_gas.xyz", data)}
+              "ovito": lambda: ovito_export.save("lattice_gas.xyz", data)}
 
     actions[action]()
 
@@ -31,8 +31,19 @@ data = data_import.Data("latticeGas.txt", AVG_T)
 
 
 #ovito_export.generate_lattice(data.grid_size)
-#ovito_export.generate_wall(data.grid_size, 50)
+
+
+print("saving for ovito")
 ovito_export.save("lattice_gas.xyz",data)
 
+data = data_import.Data("latticeGas.txt", AVG_T)
+print("saving flow for ovito")
+ovito_export.flow("flow.xyz",data)
+
+print("generating walls")
+#ovito_export.generate_wall(data.grid_size, data.hole_size)
+
+print("rendering ovito")
+#ovito_render.animate_particles()
 #print("Time:", time.time() - start)
 

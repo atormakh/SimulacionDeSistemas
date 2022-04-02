@@ -89,7 +89,7 @@ public class LatticeGas {
 
 
 
-        out.write(numParticles + " " + gridSize + "\n");
+        out.write(numParticles + " " + gridSize+ " " + holeSize + "\n");
         int iter;
         float a = 1;
         float b = 0;
