@@ -1,13 +1,9 @@
 from cProfile import label
 import os
 import random
-import sys
 import matplotlib.pyplot as plt
-import matplotlib
 import math
-import data_import
 import statistics
-
 import pickle
 
 
@@ -28,10 +24,6 @@ try:
 except:
     cache = {}
 
-
-path = "stats_output/"
-
-os.makedirs(path, exist_ok=True)
 
 data = {}
 
@@ -93,3 +85,34 @@ for numParticles in particles:
 
 plt.legend()
 plt.savefig("time_vs_holes_sizes.png")
+
+
+
+import data_import
+import numpy as np
+
+HOLE_SIZE = 50
+
+particles = [2000, 3000, 5000]
+
+plt.figure("Equilibrium", figsize=(10, 10))
+plt.xlabel("time")
+plt.ylabel("particles proportion left side")
+colors = ["red", "blue", "green"]
+for num_particles in particles:
+    command = f"java -cp target/latticeGas-1.0-SNAPSHOT.jar -DnumParticles={num_particles} -DholeSize={HOLE_SIZE} -Dseed={seed} latticeGas.Main "
+    print(command)
+    proc = os.popen(command)
+    time = proc.readline()
+    data = data_import.Data("latticeGas.txt", 1)
+    count = []
+    for time, a,b, _data in data:
+        #count.append((a,b))
+        count.append(a)
+
+    plt.plot(count, colors[-1], label=f"N particles {num_particles}")
+    colors.pop()   
+
+plt.legend()
+plt.yticks(np.arange(0.5,1.05,0.05))
+plt.savefig("{}_equilibrium.png".format(HOLE_SIZE))
