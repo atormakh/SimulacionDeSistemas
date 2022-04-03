@@ -9,6 +9,7 @@ public class Main {
 
         int holeSize = Integer.parseInt(System.getProperty("holeSize","50"));
         int numParticles = Integer.parseInt(System.getProperty("numParticles","2000"));
+        int maxIterations = Integer.parseInt(System.getProperty("maxIterations","5000"));
         int seed = Integer.parseInt(System.getProperty("seed","0"));
         float threshold = Float.parseFloat(System.getProperty("threshold","0.05"));
 
@@ -23,7 +24,7 @@ public class Main {
             System.exit(1);
         }
         try {
-            latticeGas.run(10000, threshold, out);
+            latticeGas.run(maxIterations, threshold, out);
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
