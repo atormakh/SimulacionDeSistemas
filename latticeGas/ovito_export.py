@@ -8,18 +8,25 @@ def generate_lattice(size=200):
             for j in range(0,size):
                 f.write("{} {} {}\n".format(i if j%2 else i-0.5,j*math.sqrt(3)/2,0))
 
-def generate_wall(size=200, hole_size=50):
-    with open("wall.xyz","w") as f:
+def generate_wall(size=200, hole_size=50, transform=True):
+    filename = ""
+    if transform: filename = "wall.xyz"
+    else: filename = "wall-no-transform.xyz"
+    with open(filename,"w") as f:
         f.write("{}\ncomment\n".format(4*(size-1)+size-hole_size))
         i = size/2
         for j in range(0,size):
             if(j <= size/2 - hole_size/2 or j > size/2 + hole_size/2):
-                f.write("{} {} {} {}\n".format(i if j%2 else i-0.5,j*math.sqrt(3)/2,0, 255,0,0))
-        
+                if transform:
+                    f.write("{} {} {} {}\n".format(i if j%2 else i-0.5,j*math.sqrt(3)/2,0, 255,0,0))
+                else:
+                    f.write("{} {} {} {}\n".format(i,j,0, 255,0,0))
+
         for i in range(0,size):
             for j in range(0,size):
                 if(i == 0 or i == size-1 or j == 0 or j == size-1):
-                    f.write("{} {} {} {}\n".format(i if j%2 else i-0.5,j*math.sqrt(3)/2,0, 255,0,0))
+                    if transform: f.write("{} {} {} {}\n".format(i if j%2 else i-0.5,j*math.sqrt(3)/2,0, 255,0,0))
+                    else: f.write("{} {} {} {}\n".format(i,j,0, 255,0,0))
 
 
 def save(filename, data):
@@ -61,3 +68,27 @@ def flow(filename,data, avg_grid=10, avg_t=10):
                     flows_y[i][j] = (flows_y[i][j]*(avg_t-1) + frame_flows_y[i][j])/avg_t
                     dump.write("{} {} {} {}\n".format(i*avg_grid,j*avg_grid*math.sqrt(3)/2,flows_x[i][j],flows_y[i][j]*math.sqrt(3)/2))
             
+def density(filename, data, avg_grid=10, avg_t=10):
+    size = int(data.grid_size/avg_grid)
+    densities = np.zeros((size, size),dtype=float)
+    #max_density = len(directions_component)*avg_grid*avg_grid
+
+    max_density = data.num_particles/(data.grid_size*data.grid_size) #particles per cell
+    max_density *= avg_grid**2 #particles per grid
+    max_density *=2 
+
+    with open(filename, "w") as dump:
+        for time, a, b, frame in data:
+            dump.write("{}\ncomment\n".format(size*size))
+            frame_densities = np.zeros((size, size),dtype=float)
+            for particle in frame[-1]:
+                x,y,dir = particle
+                x = int(x/avg_grid)
+                y = int(y/avg_grid)
+                frame_densities[x][y] += 1
+            
+            for i in range(0,size):
+                for j in range(0,size):
+                    densities[i][j] = (densities[i][j]*(avg_t-1) + frame_densities[i][j])/avg_t
+                    alpha = densities[i][j]/max_density
+                    dump.write("{} {} {}\n".format(i*avg_grid + avg_grid/2,j*avg_grid + avg_grid/2, 1-alpha))
