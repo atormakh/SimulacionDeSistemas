@@ -26,7 +26,7 @@ def save_density(avg_grid, avg_t):
 def run(N = 2000, hole_size=50, seed = 0, avg_grid = 10, avg_t=10, threshold=0.05, max_iterations=5000, render=True):
     if not seed: seed = random.randint(1, 2**16)
 
-    dir = "output/{}_{}_{}_{}_{}".format(N,hole_size,seed,avg_grid,avg_t)
+    dir = "output/{}_{}_{}_{}_{}_{}".format(N,hole_size,seed,avg_grid,avg_t,threshold)
     os.makedirs(dir, exist_ok=True)
     os.chdir(dir)
 
@@ -35,7 +35,7 @@ def run(N = 2000, hole_size=50, seed = 0, avg_grid = 10, avg_t=10, threshold=0.0
     
     data = data_import.Data("latticeGas.txt", 1)
 
-    py_plot.plotGraphs(data)
+    py_plot.plotGraphs(data,N, hole_size, avg_t, True)
 
     if not render:
         return

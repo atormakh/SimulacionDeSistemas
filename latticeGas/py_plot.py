@@ -162,11 +162,45 @@ def plotFlow(avg_grid, data):
     plot("flow",update, grid_size, data, 1)
 
 
-def plotGraphs(data):
+def plotGraphs(data,N=2000, hole_size = 50, avg_t = 10, f=False):
     count = []
+    flow = []
+    flow_actual = 0
     for time, a,b, _data in data:
+        if f:
+            old = count[-1][0] if count else a
+            flow_actual = (flow_actual*(avg_t -1)+ old-a)/avg_t
+            flow.append(flow_actual)
         count.append((a,b))
-    plt.figure("Lattice Gas", figsize=(10, 10))
-    plt.plot(count)    
-    plt.show()
-    plt.savefig("particles.png")
+        
+    plt.figure("Lattice Gas Particles", figsize=(10, 10))
+    plt.plot(count)
+    plt.title("N={} and Hole size={}".format(N, hole_size))
+    plt.xlabel("time")
+    plt.ylabel("particles proportion")
+    plt.yticks(np.arange(0,1.05,0.05))
+    plt.grid()
+        
+    plt.savefig("equilibrium.png")   
+    #plt.show()
+ 
+    
+    if not flow:
+        return
+
+    max_flow = max(flow)
+
+    flow = [x/max_flow for x in flow]
+
+    plt.figure("Flow")
+    plt.title("N={} and Hole size={}".format(N, hole_size))
+    plt.xlabel("time")
+    plt.ylabel("flow")
+    plt.grid()
+    plt.plot(flow)
+    plt.savefig("flow.png")
+   # plt.show()
+
+   
+
+
