@@ -24,5 +24,6 @@
 *.txt
 *.xyz
 *.ovito
+*.gif
 
 *__pycache__

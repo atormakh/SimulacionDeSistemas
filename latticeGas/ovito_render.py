@@ -76,7 +76,7 @@ def animate_flow():
     ratio = y/x
     size = 500
     vp.render_anim(size=(size, size), filename="flow.avi",
-                   fps=15, background=(0, 0, 0))
+                   fps=20, background=(0, 0, 0))
     static.remove_from_scene()
     flow.remove_from_scene()
 
@@ -106,7 +106,7 @@ def animate_density(avg_grid=10):
     ratio = y/x
     size = 500
     vp.render_anim(size=(size, size), filename="density.avi",
-                   fps=15, background=(0, 0, 0))
+                   fps=20, background=(0, 0, 0))
     static.remove_from_scene()
     density.remove_from_scene()
 
