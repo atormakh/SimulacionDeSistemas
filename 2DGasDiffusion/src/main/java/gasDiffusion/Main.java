@@ -1,4 +1,4 @@
-package 2DGasDiffusion;
+package gasDiffusion;
 import java.io.FileWriter;
 import java.io.IOException;
 
