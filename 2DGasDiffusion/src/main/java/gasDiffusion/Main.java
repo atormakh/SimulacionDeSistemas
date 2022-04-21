@@ -4,8 +4,8 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        int holeSize = Integer.parseInt(System.getProperty("holeSize", "50"));
-        int numParticles = Integer.parseInt(System.getProperty("numParticles", "2000"));
+        double holeSize = Float.parseFloat(System.getProperty("holeSize", "0.03"));
+        int numParticles = Integer.parseInt(System.getProperty("numParticles", "10"));
         int maxIterations = Integer.parseInt(System.getProperty("maxIterations", "5000"));
         int seed = Integer.parseInt(System.getProperty("seed", "0"));
         float threshold = Float.parseFloat(System.getProperty("threshold", "0.05"));

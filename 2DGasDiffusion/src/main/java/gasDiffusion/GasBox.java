@@ -1,65 +1,186 @@
 package gasDiffusion;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.io.FileWriter;
-public class GasBox{
 
-    int holeSize,numParticles;
+import java.io.IOException;
+import java.util.*;
+import java.io.FileWriter;
+
+public class GasBox {
+
+    int numParticles;
+    double holeSize;
     float threshold;
-    Double BOX_HEIGHT=0.09, BOX_WIDTH=0.24,PARTICLE_MASS=1.0,INITIAL_VELOCITY=0.1,PARTICLE_RADIUS=0.0015,THRESHOLD=7.0;
+    Double BOX_HEIGHT = 0.09, BOX_WIDTH = 0.24, PARTICLE_MASS = 1.0, INITIAL_VELOCITY = 0.1, PARTICLE_RADIUS = 0.0015, THRESHOLD = 0.07;
     Random random;
     List<Particle> particles;
+    Queue<Event> queue;
 
-    public GasBox(int holeSize,int numParticles,int seed,float threshold){
-        this.holeSize=holeSize;
-        this.numParticles=numParticles;
-        this.random= new Random(seed);
-        this.threshold=threshold;
-        particles=new ArrayList<>();
+    public GasBox(double holeSize, int numParticles, int seed, float threshold) {
+        this.holeSize = holeSize;
+        this.numParticles = numParticles;
+        this.random = new Random(seed);
+        this.threshold = threshold;
+        particles = new ArrayList<>();
+        queue = new PriorityQueue<>();
     }
 
-    public void run(int maxIterations,FileWriter out){
-        //1) Se definen las posiciones y velocidades iniciales, los radios y tamaño de la caja.
-        for(int i=0;i<numParticles;i++){
-            Double x = random.nextDouble()*(BOX_WIDTH/2);
-            Double y= random.nextDouble()*BOX_HEIGHT;
-            Double vx = random.nextDouble();
-            Double vy = Math.sqrt(-Math.pow(vx,2) + Math.pow(INITIAL_VELOCITY,2));
-            particles.add(new Particle(x,y,vx,vy,PARTICLE_MASS,PARTICLE_RADIUS));
-        }
-        try {
-            out.write(numParticles + " " + BOX_HEIGHT+ " "+BOX_WIDTH + " " + holeSize + "\n");
-            for (Particle particle:particles){
-                out.write(particle.x + " "+ particle.y+ "\n");
+    private boolean isCollision(Double x, Double y) {
+        for (Particle particle : particles) {
+            if (Math.sqrt(Math.pow(particle.x - x, 2) + Math.pow(particle.y - y, 2)) <= 2 * PARTICLE_RADIUS) {
+                return true;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    private void calculateEventsForParticle(Particle particle) {
+        double tc;
+        //Choque con el borde izq/der
+        tc = particle.vx > 0 ? (BOX_WIDTH - particle.radius - particle.x) / particle.vx : (particle.radius - particle.x) / particle.vx;
+        queue.add(new EventX(tc, particle));
+
+        //Choque con el borde sup/inf
+        tc = particle.vy > 0 ? (BOX_HEIGHT - particle.radius - particle.y) / particle.vy : (particle.radius - particle.y) / particle.vy;
+        queue.add(new EventY(tc, particle));
+
+        //Choque con el medio
+        Event ev = null;
+        if (particle.x < BOX_WIDTH / 2 && particle.vx > 0) {
+            tc = (BOX_WIDTH / 2 - particle.radius - particle.x) / particle.vx;
+            ev = new EventX(tc, particle);
+
+        } else if (particle.x > BOX_WIDTH / 2 && particle.vx < 0) {
+            tc = (BOX_WIDTH / 2 + particle.radius - particle.x) / particle.vx;
+            ev = new EventX(tc, particle);
+        }
+        //Chequeamos que la particula no pase en X por el tabique pero por el agujero
+        if (ev != null) {
+            if (particle.y + particle.vy * ev.getTime() > BOX_HEIGHT / 2 - holeSize / 2 && particle.y + particle.vy * ev.getTime() > BOX_HEIGHT / 2 + holeSize / 2)
+                queue.add(ev);
+            else if (particle.y + particle.vy * ev.getTime() == BOX_HEIGHT / 2 - holeSize / 2 || particle.y + particle.vy * ev.getTime() == BOX_HEIGHT / 2 + holeSize / 2) { //Choque con extremos tabique
+                queue.add(new ObstacleEvent(ev.getTime(), particle));
+            }
+        }
+        //Choque con otras partículas
+        for (Particle particle2 : particles) {
+            if (particle != particle2) {
+                double dvx = particle.vx - particle2.vx;
+                double dvy = particle.vy - particle2.vy;
+                double dvdv = dvx * dvx + dvy * dvy;
+
+                double dx = particle.x - particle2.x;
+                double dy = particle.y - particle2.y;
+
+                double drdr = dx * dx + dy * dy;
+
+                double dvdr = dvx * dx + dvy * dy;
+
+                double sigma = particle.radius + particle2.radius;
+
+                double d = dvdr * dvdr - dvdv * (drdr - sigma * sigma);
+
+
+                if (dvdr < 0 && d > 0) {
+                    tc = -(dvdr + Math.sqrt(d)) / dvdv;
+                    queue.add(new CollisionEvent(tc, particle, particle2));
+                }
+
+
+            }
         }
 
-        while(calculateBalance(particles)>=(50-THRESHOLD)){
-            //2) Se calcula el tiempo hasta el primer choque (evento!) (tc).
-            //Double timeToCollision = getTimeToCollision();
-            //3) Se evolucionan todas las partículas según sus ecuaciones de movimiento hasta tc .
-            //4) Se guarda el estado del sistema (posiciones y velocidades) en t = tc
-            //5) Con el “operador de colisión” se determinan las nuevas velocidades después del choque, solo para las partículas que chocaron.
-            //6) ir a 2).
+    }
+
+    private void calculateInitialEvents() {
+        for (Particle particle : particles) {
+            calculateEventsForParticle(particle);
+        }
+    }
+
+    public void run(int maxIterations, FileWriter out) throws IOException {
+        //1) Se definen las posiciones y velocidades iniciales, los radios y tamaño de la caja.
+        for (int i = 0; i < numParticles; i++) {
+            Double x, y;
+            do {
+                x = random.nextDouble() * (BOX_WIDTH / 2);
+                y = random.nextDouble() * BOX_HEIGHT;
+            } while (isCollision(x, y));
+
+
+            double angle = random.nextDouble() * 2 * Math.PI;
+
+            double vx = INITIAL_VELOCITY * Math.cos(angle);
+            double vy = INITIAL_VELOCITY * Math.sin(angle);
+
+            particles.add(new Particle(x, y, vx, vy, PARTICLE_MASS, PARTICLE_RADIUS));
         }
 
+        out.write(numParticles + " " + BOX_HEIGHT + " " + BOX_WIDTH + " " + holeSize + "\n");
+        double time = 0;
+
+        out.write(time + "\n");
+        for (Particle particle : particles) {
+            out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + " " + particle.radius + "\n");
+        }
+
+        System.out.println("Calculating initial events");
+        calculateInitialEvents();
+
+
+        while (calculateBalance(particles) >= (0.5 - THRESHOLD)) {
+            System.out.println(time);
+            Event event;
+            do {
+                event = queue.poll();
+                if (event == null) {
+                    System.out.println("No hay eventos");
+                    System.exit(1);
+                }
+            } while (!event.isValid());
+
+
+            for (Particle particle : particles) {
+                // Se evolucionan todas las partículas según sus ecuaciones de movimiento hasta tc .
+                particle.update(event.getTime());
+
+                //Se guarda el estado del sistema (posiciones y velocidades) en t = tc
+                time += event.getTime();
+                out.write(time + "\n");
+                out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + " " + particle.radius + "\n");
+            }
+
+            //se determinan las nuevas velocidades después del choque, solo para las partículas que chocaron.
+
+            event.updateParticles();
+
+            //Se invalidan los eventos para las partículas que han chocado.
+            for (Event ev : queue) {
+                for (Particle particle : event.getParticles()) {
+                    if (ev.getParticles().contains(particle)) {
+                        ev.invalidate();
+                    }
+                }
+            }
+
+            //Se calculan los nuevos eventos para las partículas que han chocado.
+            for (Particle particle : event.getParticles()) {
+                calculateEventsForParticle(particle);
+            }
+
+        }
     }
 
     //Calcula el porcentaje de particulas en el primer rectangulo
-    private Double calculateBalance(List<Particle> particles){
-        int amount=0;
-        for(Particle particle:particles){
+    private Double calculateBalance(List<Particle> particles) {
+        int amount = 0;
+        for (Particle particle : particles) {
             if (isInLeftRectangle(particle)) amount++;
         }
-        return amount*1.0/numParticles;
+        return amount * 1.0 / numParticles;
     }
 
-    public boolean isInLeftRectangle(Particle particle){
-        if(particle.x < BOX_WIDTH/2) return true;
+    public boolean isInLeftRectangle(Particle particle) {
+        if (particle.x < BOX_WIDTH / 2) return true;
         return false;
     }
 }

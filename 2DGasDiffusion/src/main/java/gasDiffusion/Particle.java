@@ -13,6 +13,8 @@ public class Particle {
     }
 
 
-
-
+    public void update(double time) {
+        x += vx * time;
+        y += vy * time;
+    }
 }
