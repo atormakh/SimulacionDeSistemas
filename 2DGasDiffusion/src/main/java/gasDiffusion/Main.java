@@ -6,8 +6,8 @@ public class Main {
     public static void main(String[] args) {
         double holeSize = Float.parseFloat(System.getProperty("holeSize", "0.03"));
         int numParticles = Integer.parseInt(System.getProperty("numParticles", "10"));
-        int maxIterations = Integer.parseInt(System.getProperty("maxIterations", "5000"));
-        int seed = Integer.parseInt(System.getProperty("seed", "0"));
+        int maxIterations = Integer.parseInt(System.getProperty("maxIterations", "10"));
+        int seed = Integer.parseInt(System.getProperty("seed", "1"));
         float threshold = Float.parseFloat(System.getProperty("threshold", "0.05"));
 
         if (seed == 0) seed = (int) (Math.random() * 1000000);

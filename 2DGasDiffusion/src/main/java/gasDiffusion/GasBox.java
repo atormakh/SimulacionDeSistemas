@@ -102,8 +102,8 @@ public class GasBox {
         for (int i = 0; i < numParticles; i++) {
             Double x, y;
             do {
-                x = random.nextDouble() * (BOX_WIDTH / 2);
-                y = random.nextDouble() * BOX_HEIGHT;
+                x = random.nextDouble() * (BOX_WIDTH / 2-2*PARTICLE_RADIUS) + 2*PARTICLE_RADIUS;
+                y = random.nextDouble() * (BOX_HEIGHT-2*PARTICLE_RADIUS) + 2*PARTICLE_RADIUS;
             } while (isCollision(x, y));
 
 
@@ -115,19 +115,22 @@ public class GasBox {
             particles.add(new Particle(x, y, vx, vy, PARTICLE_MASS, PARTICLE_RADIUS));
         }
 
-        out.write(numParticles + " " + BOX_HEIGHT + " " + BOX_WIDTH + " " + holeSize + "\n");
+        out.write(numParticles + " " + holeSize+  "\n");
         double time = 0;
 
-        out.write(time + "\n");
+        out.write(time + " 1 0\n");
         for (Particle particle : particles) {
-            out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + " " + particle.radius + "\n");
+            out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");
         }
 
         System.out.println("Calculating initial events");
         calculateInitialEvents();
 
 
-        while (calculateBalance(particles) >= (0.5 - THRESHOLD)) {
+        double a,b;
+        int iter = 0;
+        while (iter <= maxIterations && (a=calculateBalance(particles)) >= (0.5 - THRESHOLD)) {
+            iter++;
             System.out.println(time);
             Event event;
             do {
@@ -139,14 +142,14 @@ public class GasBox {
             } while (!event.isValid());
 
 
+            time += event.getTime();
+            out.write(time + " " + a + " " + (1-a) + "\n");
             for (Particle particle : particles) {
                 // Se evolucionan todas las partículas según sus ecuaciones de movimiento hasta tc .
                 particle.update(event.getTime());
 
                 //Se guarda el estado del sistema (posiciones y velocidades) en t = tc
-                time += event.getTime();
-                out.write(time + "\n");
-                out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + " " + particle.radius + "\n");
+                out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");
             }
 
             //se determinan las nuevas velocidades después del choque, solo para las partículas que chocaron.
