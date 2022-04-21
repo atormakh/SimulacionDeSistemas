@@ -13,12 +13,14 @@ public class GasBox {
     Random random;
     List<Particle> particles;
     Queue<Event> queue;
+    double time;
 
     public GasBox(double holeSize, int numParticles, int seed, float threshold) {
         this.holeSize = holeSize;
         this.numParticles = numParticles;
         this.random = new Random(seed);
         this.threshold = threshold;
+        this.time = 0;
         particles = new ArrayList<>();
         queue = new PriorityQueue<>();
     }
@@ -37,21 +39,21 @@ public class GasBox {
         double tc;
         //Choque con el borde izq/der
         tc = particle.vx > 0 ? (BOX_WIDTH - particle.radius - particle.x) / particle.vx : (particle.radius - particle.x) / particle.vx;
-        queue.add(new EventX(tc, particle));
+        queue.add(new EventX(tc + time, particle));
 
         //Choque con el borde sup/inf
         tc = particle.vy > 0 ? (BOX_HEIGHT - particle.radius - particle.y) / particle.vy : (particle.radius - particle.y) / particle.vy;
-        queue.add(new EventY(tc, particle));
+        queue.add(new EventY(tc + time, particle));
 
         //Choque con el medio
         Event ev = null;
         if (particle.x < BOX_WIDTH / 2 && particle.vx > 0) {
             tc = (BOX_WIDTH / 2 - particle.radius - particle.x) / particle.vx;
-            ev = new EventX(tc, particle);
+            ev = new EventX(tc + time, particle);
 
         } else if (particle.x > BOX_WIDTH / 2 && particle.vx < 0) {
             tc = (BOX_WIDTH / 2 + particle.radius - particle.x) / particle.vx;
-            ev = new EventX(tc, particle);
+            ev = new EventX(tc + time, particle);
         }
         //Chequeamos que la particula no pase en X por el tabique pero por el agujero
         if (ev != null) {
@@ -82,7 +84,7 @@ public class GasBox {
 
                 if (dvdr < 0 && d > 0) {
                     tc = -(dvdr + Math.sqrt(d)) / dvdv;
-                    queue.add(new CollisionEvent(tc, particle, particle2));
+                    queue.add(new CollisionEvent(tc+time, particle, particle2));
                 }
 
 
@@ -102,8 +104,8 @@ public class GasBox {
         for (int i = 0; i < numParticles; i++) {
             Double x, y;
             do {
-                x = random.nextDouble() * (BOX_WIDTH / 2-2*PARTICLE_RADIUS) + 2*PARTICLE_RADIUS;
-                y = random.nextDouble() * (BOX_HEIGHT-2*PARTICLE_RADIUS) + 2*PARTICLE_RADIUS;
+                x = random.nextDouble() * (BOX_WIDTH / 2 - 2 * PARTICLE_RADIUS) + 2 * PARTICLE_RADIUS;
+                y = random.nextDouble() * (BOX_HEIGHT - 2 * PARTICLE_RADIUS) + 2 * PARTICLE_RADIUS;
             } while (isCollision(x, y));
 
 
@@ -115,8 +117,7 @@ public class GasBox {
             particles.add(new Particle(x, y, vx, vy, PARTICLE_MASS, PARTICLE_RADIUS));
         }
 
-        out.write(numParticles + " " + holeSize+  "\n");
-        double time = 0;
+        out.write(numParticles + " " + holeSize + "\n");
 
         out.write(time + " 1 0\n");
         for (Particle particle : particles) {
@@ -127,9 +128,10 @@ public class GasBox {
         calculateInitialEvents();
 
 
-        double a,b;
+        double a, b;
         int iter = 0;
-        while (iter <= maxIterations && (a=calculateBalance(particles)) >= (0.5 - THRESHOLD)) {
+        double delta = 0;
+        while (iter <= maxIterations && (a = calculateBalance(particles)) >= (0.5 - THRESHOLD)) {
             iter++;
             System.out.println(time);
             Event event;
@@ -142,11 +144,12 @@ public class GasBox {
             } while (!event.isValid());
 
 
-            time += event.getTime();
-            out.write(time + " " + a + " " + (1-a) + "\n");
+            delta = event.getTime() - time;
+            time = event.getTime();
+            out.write(time + " " + a + " " + (1 - a) + "\n");
             for (Particle particle : particles) {
                 // Se evolucionan todas las partículas según sus ecuaciones de movimiento hasta tc .
-                particle.update(event.getTime());
+                particle.update(delta);
 
                 //Se guarda el estado del sistema (posiciones y velocidades) en t = tc
                 out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");

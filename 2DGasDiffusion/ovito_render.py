@@ -11,7 +11,7 @@ def animate_particles():
     static = ovito.io.import_file(
         "wall.xyz", columns=["Position.X", "Position.Y", "Position.Z", "Color.R"])
     particles = ovito.io.import_file("gas.xyz", columns=[
-                                     "Position.X", "Position.Y", "Position.Z"])
+                                     "Position.X", "Position.Y"])
 
     particles.modifiers.append(particle_modifier)
 

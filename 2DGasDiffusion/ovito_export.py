@@ -33,5 +33,5 @@ def save(filename, data):
             dump.write("{}\ncomment\n".format(len(frame)))
             for particle in frame:
                 x, y, vx, vy = particle
-                dump.write("{} {} {}\n".format(MULTIPLIER*x, MULTIPLIER*y, 0))
+                dump.write("{} {} {} {}\n".format(MULTIPLIER*x, MULTIPLIER*y, vx*MULTIPLIER, vy*MULTIPLIER))
     dump.close()
