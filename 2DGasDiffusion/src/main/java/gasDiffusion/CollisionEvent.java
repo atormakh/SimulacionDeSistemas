@@ -17,11 +17,11 @@ public class CollisionEvent extends Event {
 
     @Override
     public void updateParticles() {
-        double dvx = a.vx - b.vx;
-        double dvy = a.vy - b.vy;
+        double dvx = b.vx - a.vx;
+        double dvy = b.vy - a.vy;
 
-        double dx = a.x - b.x;
-        double dy = a.y - b.y;
+        double dx = b.x - a.x;
+        double dy = b.y - a.y;
 
 
         double dvdr = dvx * dx + dvy * dy;

@@ -10,7 +10,7 @@ public abstract class Event implements Comparable<Event> {
 
     public Event(double tc) {
         if(tc < 0) {
-            System.out.println("Negative time");
+            valid = false;
         }
         this.time = tc;
     }

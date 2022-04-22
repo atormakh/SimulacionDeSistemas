@@ -45,6 +45,7 @@ public class GasBox {
         tc = particle.vy > 0 ? (BOX_HEIGHT - particle.radius - particle.y) / particle.vy : (particle.radius - particle.y) / particle.vy;
         queue.add(new EventY(tc + time, particle));
 
+
         //Choque con el medio
         Event ev = null;
         if (particle.x < BOX_WIDTH / 2 && particle.vx > 0) {
@@ -57,21 +58,24 @@ public class GasBox {
         }
         //Chequeamos que la particula no pase en X por el tabique pero por el agujero
         if (ev != null) {
-            if (particle.y + particle.vy * ev.getTime() > BOX_HEIGHT / 2 - holeSize / 2 && particle.y + particle.vy * ev.getTime() > BOX_HEIGHT / 2 + holeSize / 2)
+            double y = particle.y + particle.vy * tc;
+            if (y < BOX_HEIGHT / 2 - holeSize / 2 || y > BOX_HEIGHT / 2 + holeSize / 2)
                 queue.add(ev);
-            else if (particle.y + particle.vy * ev.getTime() == BOX_HEIGHT / 2 - holeSize / 2 || particle.y + particle.vy * ev.getTime() == BOX_HEIGHT / 2 + holeSize / 2) { //Choque con extremos tabique
-                queue.add(new ObstacleEvent(ev.getTime(), particle));
+            else if (y == BOX_HEIGHT / 2 - holeSize / 2 || y == BOX_HEIGHT / 2 + holeSize / 2) { //Choque con extremos tabique
+                //queue.add(new ObstacleEvent(ev.getTime(), particle));
             }
         }
+
         //Choque con otras partículas
         for (Particle particle2 : particles) {
             if (particle != particle2) {
-                double dvx = particle.vx - particle2.vx;
-                double dvy = particle.vy - particle2.vy;
+
+                double dvx = particle2.vx - particle.vx;
+                double dvy = particle2.vy - particle.vy;
                 double dvdv = dvx * dvx + dvy * dvy;
 
-                double dx = particle.x - particle2.x;
-                double dy = particle.y - particle2.y;
+                double dx = particle2.x - particle.x;
+                double dy = particle2.y - particle.y;
 
                 double drdr = dx * dx + dy * dy;
 
@@ -117,6 +121,12 @@ public class GasBox {
             particles.add(new Particle(x, y, vx, vy, PARTICLE_MASS, PARTICLE_RADIUS));
         }
 
+/*
+        numParticles = 2;
+        particles.add(new Particle(BOX_WIDTH/2 - BOX_WIDTH*0.2, BOX_HEIGHT/2, INITIAL_VELOCITY, 0d, PARTICLE_MASS, PARTICLE_RADIUS));
+        particles.add(new Particle(BOX_WIDTH/2 -2*PARTICLE_RADIUS, BOX_HEIGHT/2, -INITIAL_VELOCITY, 0d, PARTICLE_MASS, PARTICLE_RADIUS));
+*/
+
         out.write(numParticles + " " + holeSize + "\n");
 
         out.write(time + " 1 0\n");
@@ -128,12 +138,13 @@ public class GasBox {
         calculateInitialEvents();
 
 
-        double a, b;
+        double a;
         int iter = 0;
-        double delta = 0;
+        double delta;
         while (iter <= maxIterations && (a = calculateBalance(particles)) >= (0.5 - THRESHOLD)) {
             iter++;
-            System.out.println(time);
+
+;
             Event event;
             do {
                 event = queue.poll();
@@ -143,21 +154,24 @@ public class GasBox {
                 }
             } while (!event.isValid());
 
+            System.out.printf("%.2f %.2f %s \n",time,a, event.getClass().getName());
 
             delta = event.getTime() - time;
             time = event.getTime();
             out.write(time + " " + a + " " + (1 - a) + "\n");
-            for (Particle particle : particles) {
-                // Se evolucionan todas las partículas según sus ecuaciones de movimiento hasta tc .
-                particle.update(delta);
 
-                //Se guarda el estado del sistema (posiciones y velocidades) en t = tc
-                out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");
+            // Se evolucionan todas las partículas según sus ecuaciones de movimiento hasta tc .
+            for (Particle particle : particles) {
+                particle.update(delta);
             }
 
             //se determinan las nuevas velocidades después del choque, solo para las partículas que chocaron.
-
             event.updateParticles();
+
+            //Se guarda el estado del sistema (posiciones y velocidades) en t = tc
+            for (Particle particle : particles) {
+                out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");
+            }
 
             //Se invalidan los eventos para las partículas que han chocado.
             for (Event ev : queue) {
@@ -186,7 +200,6 @@ public class GasBox {
     }
 
     public boolean isInLeftRectangle(Particle particle) {
-        if (particle.x < BOX_WIDTH / 2) return true;
-        return false;
+        return particle.x < BOX_WIDTH / 2;
     }
 }
