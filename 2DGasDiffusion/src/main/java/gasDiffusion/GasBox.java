@@ -9,7 +9,7 @@ public class GasBox {
     int numParticles;
     double holeSize;
     float threshold;
-    Double BOX_HEIGHT = 0.09, BOX_WIDTH = 0.24, PARTICLE_MASS = 1.0, INITIAL_VELOCITY = 0.1, PARTICLE_RADIUS = 0.0015, THRESHOLD = 0.07;
+    Double BOX_HEIGHT = 0.09, BOX_WIDTH = 0.24, PARTICLE_MASS = 1.0, INITIAL_VELOCITY = 0.1, PARTICLE_RADIUS = 0.0015;
     Random random;
     List<Particle> particles;
     Queue<Event> queue;
@@ -141,7 +141,7 @@ public class GasBox {
         double a;
         int iter = 0;
         double delta;
-        while (iter <= maxIterations && (a = calculateBalance(particles)) >= (0.5 - THRESHOLD)) {
+        while (iter <= maxIterations && Math.abs((a = calculateBalance(particles))-0.5) >  threshold) {
             iter++;
 
 ;

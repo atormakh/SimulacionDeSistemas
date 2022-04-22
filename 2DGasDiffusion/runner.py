@@ -18,7 +18,7 @@ BOX_HEIGHT =0.09
 BOX_WIDTH=0.24
 
 
-def run(N=2000, hole_size=0.03, seed=0, threshold=0.05, max_iterations=5000, render=True):
+def run(N=2000, hole_size=0.03, seed=0, threshold=0.05, max_iterations=100000, render=True):
     if not seed:
         seed = random.randint(1, 2**16)
 
@@ -31,7 +31,7 @@ def run(N=2000, hole_size=0.03, seed=0, threshold=0.05, max_iterations=5000, ren
     
     #print(proc.readlines())
     proc.readlines()
-
+    print("FINISH JAVA")
     data = data_import.Data("2DGasDiffusion.txt")
 
     py_plot.plotGraphs(data, N, hole_size, True)
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     parser.add_argument("-th", "--threshold", type=float,
                         default=0.05, help="threshold")
     parser.add_argument("-m", "--maxIterations", type=int,
-                        default=100, help="max iterations")
+                        default=100000, help="max iterations")
     parser.add_argument("-r", "--render", type=bool,
                         default=False, help="Render ovito")
 

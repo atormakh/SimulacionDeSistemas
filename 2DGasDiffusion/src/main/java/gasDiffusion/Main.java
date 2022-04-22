@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) {
         double holeSize = Float.parseFloat(System.getProperty("holeSize", "0.03"));
         int numParticles = Integer.parseInt(System.getProperty("numParticles", "10"));
-        int maxIterations = Integer.parseInt(System.getProperty("maxIterations", "1000"));
+        int maxIterations = Integer.parseInt(System.getProperty("maxIterations", "15000"));
         int seed = Integer.parseInt(System.getProperty("seed", "1"));
         float threshold = Float.parseFloat(System.getProperty("threshold", "0.05"));
 
