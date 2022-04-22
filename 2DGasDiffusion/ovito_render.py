@@ -3,18 +3,21 @@ import ovito
 
 def particle_modifier(frame, data):
     print("\r{}".format(frame), end="")
-    data.particles.display.radius = 1
+
+def wall_modifier(frame, data):
+    data.particles.display.shape = ovito.vis.ParticlesVis.Shape.Square
+
 
 
 
 def animate_particles():
     static = ovito.io.import_file(
-        "wall.xyz", columns=["Position.X", "Position.Y", "Position.Z", "Color.R"])
+        "wall.xyz", columns=["Position.X", "Position.Y", "Radius", "Color.R"])
     particles = ovito.io.import_file("gas.xyz", columns=[
-                                     "Position.X", "Position.Y"])
+                                     "Position.X", "Position.Y", "Radius"])
 
     particles.modifiers.append(particle_modifier)
-
+    static.modifiers.append(wall_modifier)
     particles.add_to_scene()
     static.add_to_scene()
 
