@@ -35,6 +35,32 @@ public class GasBox {
     }
 
 
+    public double particleCollision(Particle particle, Particle particle2) {
+        double dvx = particle2.vx - particle.vx;
+        double dvy = particle2.vy - particle.vy;
+        double dvdv = dvx * dvx + dvy * dvy;
+
+        double dx = particle2.x - particle.x;
+        double dy = particle2.y - particle.y;
+
+        double drdr = dx * dx + dy * dy;
+
+        double dvdr = dvx * dx + dvy * dy;
+
+        double sigma = particle.radius + particle2.radius;
+
+        double d = dvdr * dvdr - dvdv * (drdr - sigma * sigma);
+
+
+        if (dvdr < 0 && d > 0) {
+            return -(dvdr + Math.sqrt(d)) / dvdv;
+        }
+        return -1;
+    }
+
+    Particle upDot = new Particle(BOX_WIDTH/2,BOX_HEIGHT/2 + holeSize/2,0d,0d,0d,0d);
+    Particle downDot = new Particle(BOX_WIDTH/2,BOX_HEIGHT/2 - holeSize/2,0d,0d,0d,0d);
+
     private void calculateEventsForParticle(Particle particle) {
         double tc;
         //Choque con el borde izq/der
@@ -48,49 +74,32 @@ public class GasBox {
 
         //Choque con el medio
         Event ev = null;
-        if (particle.x < BOX_WIDTH / 2 && particle.vx > 0) {
+        if (particle.x <= BOX_WIDTH / 2 && particle.vx > 0) {
             tc = (BOX_WIDTH / 2 - particle.radius - particle.x) / particle.vx;
             ev = new EventX(tc + time, particle);
 
-        } else if (particle.x > BOX_WIDTH / 2 && particle.vx < 0) {
+        } else if (particle.x >= BOX_WIDTH / 2 && particle.vx < 0) {
             tc = (BOX_WIDTH / 2 + particle.radius - particle.x) / particle.vx;
             ev = new EventX(tc + time, particle);
         }
         //Chequeamos que la particula no pase en X por el tabique pero por el agujero
         if (ev != null) {
             double y = particle.y + particle.vy * tc;
-            if (y < BOX_HEIGHT / 2 - holeSize / 2 || y > BOX_HEIGHT / 2 + holeSize / 2)
+            if (y < (BOX_HEIGHT / 2 - holeSize / 2) || y > (BOX_HEIGHT / 2 + holeSize / 2))
                 queue.add(ev);
-            else if (y == BOX_HEIGHT / 2 - holeSize / 2 || y == BOX_HEIGHT / 2 + holeSize / 2) { //Choque con extremos tabique
-                //queue.add(new ObstacleEvent(ev.getTime(), particle));
-            }
         }
+
+        //Choque con extremos del agujero
+            tc = particleCollision(particle, upDot);
+            if (tc > 0) queue.add(new ObstacleEvent(tc + time, particle));
+            tc = particleCollision(particle, downDot);
+            if (tc > 0) queue.add(new ObstacleEvent(tc + time, particle));
 
         //Choque con otras partículas
         for (Particle particle2 : particles) {
             if (particle != particle2) {
-
-                double dvx = particle2.vx - particle.vx;
-                double dvy = particle2.vy - particle.vy;
-                double dvdv = dvx * dvx + dvy * dvy;
-
-                double dx = particle2.x - particle.x;
-                double dy = particle2.y - particle.y;
-
-                double drdr = dx * dx + dy * dy;
-
-                double dvdr = dvx * dx + dvy * dy;
-
-                double sigma = particle.radius + particle2.radius;
-
-                double d = dvdr * dvdr - dvdv * (drdr - sigma * sigma);
-
-
-                if (dvdr < 0 && d > 0) {
-                    tc = -(dvdr + Math.sqrt(d)) / dvdv;
-                    queue.add(new CollisionEvent(tc+time, particle, particle2));
-                }
-
+                tc = particleCollision(particle, particle2);
+                if (tc >= 0) queue.add(new CollisionEvent(tc + time, particle, particle2));
 
             }
         }
@@ -105,11 +114,12 @@ public class GasBox {
 
     public void run(int maxIterations, FileWriter out) throws IOException {
         //1) Se definen las posiciones y velocidades iniciales, los radios y tamaño de la caja.
+        double MARGIN = PARTICLE_RADIUS * 2;
         for (int i = 0; i < numParticles; i++) {
             Double x, y;
             do {
-                x = random.nextDouble() * (BOX_WIDTH / 2 - 2 * PARTICLE_RADIUS) + 2 * PARTICLE_RADIUS;
-                y = random.nextDouble() * (BOX_HEIGHT - 2 * PARTICLE_RADIUS) + 2 * PARTICLE_RADIUS;
+                x = random.nextDouble() * (BOX_WIDTH / 2 - 2 * MARGIN) + MARGIN;
+                y = random.nextDouble() * (BOX_HEIGHT - 2 * MARGIN) + MARGIN;
             } while (isCollision(x, y));
 
 
@@ -120,6 +130,12 @@ public class GasBox {
 
             particles.add(new Particle(x, y, vx, vy, PARTICLE_MASS, PARTICLE_RADIUS));
         }
+
+/*        numParticles = (int) (BOX_HEIGHT/(PARTICLE_RADIUS/2));
+
+        for(int n = 0; n < numParticles; n++){
+            particles.add(new Particle(BOX_WIDTH/5, BOX_HEIGHT*n/numParticles, INITIAL_VELOCITY, 0d, PARTICLE_MASS, PARTICLE_RADIUS));
+        }*/
 
 /*
         numParticles = 2;
@@ -141,10 +157,10 @@ public class GasBox {
         double a;
         int iter = 0;
         double delta;
-        while (iter <= maxIterations && Math.abs((a = calculateBalance(particles))-0.5) >  threshold) {
+        while (iter <= maxIterations && Math.abs((a = calculateBalance(particles)) - 0.5) > threshold) {
             iter++;
 
-;
+            ;
             Event event;
             do {
                 event = queue.poll();
@@ -154,7 +170,7 @@ public class GasBox {
                 }
             } while (!event.isValid());
 
-            System.out.printf("%.2f %.2f %s \n",time,a, event.getClass().getName());
+            System.out.printf("%.2f %.2f %s \n", time, a, event.getClass().getName());
 
             delta = event.getTime() - time;
             time = event.getTime();

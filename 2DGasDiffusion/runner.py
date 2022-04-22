@@ -40,7 +40,7 @@ def run(N=2000, hole_size=0.03, seed=0, threshold=0.05, max_iterations=100000, r
         return
 
     print("generating walls")
-    ovito_export.generate_wall(0.24, 0.09, data.hole_size)
+    ovito_export.generate_wall(0.24, 0.09, hole_size)
 
     save_particles_p = Process(target=save_particles)
     save_particles_p.start()

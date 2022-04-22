@@ -8,11 +8,14 @@ public class ObstacleEvent extends Event {
 
     public ObstacleEvent(double time, Particle particle) {
         super(time);
+        this.particle = particle;
     }
 
     @Override
     public void updateParticles() {
-        System.out.println("WAAAAAAAAAAAAAAZZZZZZAAAAAAA");
+        particle.vx = 0d;
+        particle.vy = 0d;
+
     }
 
     @Override
