@@ -14,6 +14,7 @@ public class GasBox {
     List<Particle> particles;
     Queue<Event> queue;
     double time;
+    Particle upDot, downDot;
 
     public GasBox(double holeSize, int numParticles, int seed, float threshold) {
         this.holeSize = holeSize;
@@ -23,6 +24,9 @@ public class GasBox {
         this.time = 0;
         particles = new ArrayList<>();
         queue = new PriorityQueue<>();
+        upDot = new Particle(BOX_WIDTH / 2, BOX_HEIGHT / 2 + holeSize / 2, 0d, 0d, 0d, 0d);
+        downDot = new Particle(BOX_WIDTH / 2, BOX_HEIGHT / 2 - holeSize / 2, 0d, 0d, 0d, 0d);
+
     }
 
     private boolean isCollision(Double x, Double y) {
@@ -58,8 +62,6 @@ public class GasBox {
         return -1;
     }
 
-    Particle upDot = new Particle(BOX_WIDTH/2,BOX_HEIGHT/2 + holeSize/2,0d,0d,0d,0d);
-    Particle downDot = new Particle(BOX_WIDTH/2,BOX_HEIGHT/2 - holeSize/2,0d,0d,0d,0d);
 
     private void calculateEventsForParticle(Particle particle) {
         double tc;
@@ -90,10 +92,12 @@ public class GasBox {
         }
 
         //Choque con extremos del agujero
-            tc = particleCollision(particle, upDot);
-            if (tc > 0) queue.add(new ObstacleEvent(tc + time, particle));
-            tc = particleCollision(particle, downDot);
-            if (tc > 0) queue.add(new ObstacleEvent(tc + time, particle));
+        tc = particleCollision(particle, upDot);
+        double alpha = Math.atan2((particle.y - upDot.y),(particle.x - upDot.x));
+        if (tc > 0) queue.add(new ObstacleEvent(tc + time, particle, alpha));
+        tc = particleCollision(particle, downDot);
+        alpha = Math.atan2((particle.y - downDot.y),(particle.x - downDot.x));
+        if (tc > 0) queue.add(new ObstacleEvent(tc + time, particle, alpha));
 
         //Choque con otras partículas
         for (Particle particle2 : particles) {
