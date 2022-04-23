@@ -174,8 +174,6 @@ public class GasBox {
                 }
             } while (!event.isValid());
 
-            System.out.printf("%.2f %.2f %s \n", time, a, event.getClass().getName());
-
             delta = event.getTime() - time;
             time = event.getTime();
             out.write(time + " " + a + " " + (1 - a) + "\n");
@@ -208,6 +206,7 @@ public class GasBox {
             }
 
         }
+        System.out.println(time);
     }
 
     //Calcula el porcentaje de particulas en el primer rectangulo
