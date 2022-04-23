@@ -135,17 +135,7 @@ public class GasBox {
             particles.add(new Particle(x, y, vx, vy, PARTICLE_MASS, PARTICLE_RADIUS));
         }
 
-/*        numParticles = (int) (BOX_HEIGHT/(PARTICLE_RADIUS/2));
 
-        for(int n = 0; n < numParticles; n++){
-            particles.add(new Particle(BOX_WIDTH/5, BOX_HEIGHT*n/numParticles, INITIAL_VELOCITY, 0d, PARTICLE_MASS, PARTICLE_RADIUS));
-        }*/
-
-/*
-        numParticles = 2;
-        particles.add(new Particle(BOX_WIDTH/2 - BOX_WIDTH*0.2, BOX_HEIGHT/2, INITIAL_VELOCITY, 0d, PARTICLE_MASS, PARTICLE_RADIUS));
-        particles.add(new Particle(BOX_WIDTH/2 -2*PARTICLE_RADIUS, BOX_HEIGHT/2, -INITIAL_VELOCITY, 0d, PARTICLE_MASS, PARTICLE_RADIUS));
-*/
 
         out.write(numParticles + " " + holeSize + "\n");
 
@@ -154,13 +144,15 @@ public class GasBox {
             out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");
         }
 
-        System.out.println("Calculating initial events");
         calculateInitialEvents();
 
 
         double a;
         int iter = 0;
         double delta;
+
+        double start = System.currentTimeMillis();
+
         while (iter <= maxIterations && Math.abs((a = calculateBalance(particles)) - 0.5) > threshold) {
             iter++;
 
@@ -206,6 +198,9 @@ public class GasBox {
             }
 
         }
+
+        double end = System.currentTimeMillis();
+        System.out.println("Time: " + (end - start)/1000);
         System.out.println(time);
     }
 
