@@ -19,39 +19,41 @@ class Data:
         return self
 
     def __next__(self):
-        if not self.header:
-            self.header = self.file.readline()
-        if not self.header:
-            raise StopIteration
+        while True:
+            if not self.header:
+                self.header = self.file.readline()
+            if not self.header:
+                raise StopIteration
 
+                
+            time, a, b = map(float, parse(self.header))
             
-        time, a, b = map(float, parse(self.header))
-        
-        data = []
+            data = []
 
-        a = 0
-        b = 0
+            a = 0
+            b = 0
 
-        if time > self.t:
-            dt = self.dt
-            for p in self.data:
-                x, y, vx, vy = p
-                if x < 0.24/2: a+=1
-                data.append((x + vx*dt, y + vy*dt, vx, vy))
+            if time > self.t:
+                dt = self.dt
+                for p in self.data:
+                    x, y, vx, vy = p
+                    if x < 0.24/2: a+=1
+                    data.append((x + vx*dt, y + vy*dt, vx, vy))
+                
+                a/=self.num_particles
+                b = 1-a
+                self.t += dt
+                self.data = data
+                return self.t, a, b, self.data
+            else:
+                self.header = ""
+                for j in range(int(self.num_particles)):
+                    x, y, vx, vy = map(float, parse(self.file.readline()))
+                    data.append((x, y, vx, vy))
+                self.data = data
             
-            a/=self.num_particles
-            b = 1-a
-            self.t += dt
-            self.data = data
-        else:
-            self.header = ""
-            for j in range(int(self.num_particles)):
-                x, y, vx, vy = map(float, parse(self.file.readline()))
-                data.append((x, y, vx, vy))
-            self.data = data
-            return self.__next__()
 
-        return self.t, a, b, self.data
+     
 
     def close(self):
         self.file.close()

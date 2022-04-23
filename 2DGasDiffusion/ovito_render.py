@@ -35,7 +35,7 @@ def animate_particles():
 
     ratio = y/x
     size = 1000
-    vp.render_anim(size=(size, int(size*ratio)),
+    vp.render_anim(size=(size, int(size*ratio/2)*2),
                    filename="particles.avi", fps=20, background=(0, 0, 0))
     static.remove_from_scene()
     particles.remove_from_scene()

@@ -28,9 +28,8 @@ def run(N=2000, hole_size=0.03, seed=0, threshold=0.05, max_iterations=100000, r
 
     proc = os.popen(
         f"java -cp ../../target/gasDiffusion-1.0-SNAPSHOT.jar -DnumParticles={N} -DholeSize={hole_size} -Dseed={seed} -Dthreshold={threshold} -DmaxIterations={max_iterations} gasDiffusion.Main")
-    
-    #print(proc.readlines())
-    proc.readlines()
+    print(proc.readlines())
+    #proc.readlines()
     print("FINISH JAVA")
     data = data_import.Data("2DGasDiffusion.txt")
 

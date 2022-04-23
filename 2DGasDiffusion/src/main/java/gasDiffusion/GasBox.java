@@ -3,6 +3,9 @@ package gasDiffusion;
 import java.io.IOException;
 import java.util.*;
 import java.io.FileWriter;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.stream.Collectors;
 
 public class GasBox {
 
@@ -23,7 +26,7 @@ public class GasBox {
         this.threshold = threshold;
         this.time = 0;
         particles = new ArrayList<>();
-        queue = new PriorityQueue<>();
+        queue = new ConcurrentLinkedDeque<>();
         upDot = new Particle(BOX_WIDTH / 2, BOX_HEIGHT / 2 + holeSize / 2, 0d, 0d, 0d, 0d);
         downDot = new Particle(BOX_WIDTH / 2, BOX_HEIGHT / 2 - holeSize / 2, 0d, 0d, 0d, 0d);
 
@@ -93,20 +96,21 @@ public class GasBox {
 
         //Choque con extremos del agujero
         tc = particleCollision(particle, upDot);
-        double alpha = Math.atan2((particle.y - upDot.y),(particle.x - upDot.x));
+        double alpha = Math.atan2((particle.y - upDot.y), (particle.x - upDot.x));
         if (tc > 0) queue.add(new ObstacleEvent(tc + time, particle, alpha));
         tc = particleCollision(particle, downDot);
-        alpha = Math.atan2((particle.y - downDot.y),(particle.x - downDot.x));
+        alpha = Math.atan2((particle.y - downDot.y), (particle.x - downDot.x));
         if (tc > 0) queue.add(new ObstacleEvent(tc + time, particle, alpha));
 
         //Choque con otras partículas
-        for (Particle particle2 : particles) {
+        particles.parallelStream().forEach(particle2 -> {
             if (particle != particle2) {
-                tc = particleCollision(particle, particle2);
-                if (tc >= 0) queue.add(new CollisionEvent(tc + time, particle, particle2));
+                double t = particleCollision(particle, particle2);
+                if (t >= 0) queue.add(new CollisionEvent(t + time, particle, particle2));
 
             }
-        }
+        });
+
 
     }
 
@@ -136,71 +140,68 @@ public class GasBox {
         }
 
 
-
         out.write(numParticles + " " + holeSize + "\n");
 
         out.write(time + " 1 0\n");
         for (Particle particle : particles) {
             out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");
         }
-
         calculateInitialEvents();
 
 
         double a;
         int iter = 0;
-        double delta;
-
         double start = System.currentTimeMillis();
-
         while (iter <= maxIterations && Math.abs((a = calculateBalance(particles)) - 0.5) > threshold) {
             iter++;
 
-            ;
-            Event event;
-            do {
-                event = queue.poll();
-                if (event == null) {
-                    System.out.println("No hay eventos");
-                    System.exit(1);
-                }
-            } while (!event.isValid());
 
-            delta = event.getTime() - time;
+            queue.removeIf(e -> !e.isValid());
+
+            Event event = queue.stream().min(Comparator.naturalOrder()).get();
+
+            queue.remove(event);
+
+            final double delta = event.getTime() - time;
             time = event.getTime();
             out.write(time + " " + a + " " + (1 - a) + "\n");
 
             // Se evolucionan todas las partículas según sus ecuaciones de movimiento hasta tc .
-            for (Particle particle : particles) {
+            particles.parallelStream().forEach(particle -> {
                 particle.update(delta);
-            }
+            });
 
             //se determinan las nuevas velocidades después del choque, solo para las partículas que chocaron.
             event.updateParticles();
 
             //Se guarda el estado del sistema (posiciones y velocidades) en t = tc
-            for (Particle particle : particles) {
-                out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");
-            }
+
+            particles.parallelStream().forEach(particle -> {
+                try {
+                    out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
             //Se invalidan los eventos para las partículas que han chocado.
-            for (Event ev : queue) {
-                for (Particle particle : event.getParticles()) {
+            final Event _event = event;
+            queue.parallelStream().forEach(ev -> {
+                _event.getParticles().forEach(particle -> {
                     if (ev.getParticles().contains(particle)) {
                         ev.invalidate();
                     }
-                }
-            }
+                });
+            });
+
 
             //Se calculan los nuevos eventos para las partículas que han chocado.
-            for (Particle particle : event.getParticles()) {
-                calculateEventsForParticle(particle);
-            }
+            event.getParticles().parallelStream().forEach(this::calculateEventsForParticle);
+
 
         }
-
         double end = System.currentTimeMillis();
-        System.out.println("Time: " + (end - start)/1000);
+        System.out.println("Tiempo: " + (end - start) / 1000);
         System.out.println(time);
     }
 
