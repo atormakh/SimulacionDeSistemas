@@ -45,4 +45,9 @@ public class CollisionEvent extends Event {
     public List<Particle> getParticles() {
         return Arrays.asList(a,b);
     }
+
+    @Override
+    public double getMomentum() {
+        return 0;
+    }
 }

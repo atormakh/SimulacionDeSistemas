@@ -30,4 +30,9 @@ public class ObstacleEvent extends Event {
     public List<Particle> getParticles() {
         return Collections.singletonList(particle);
     }
+
+    @Override
+    public double getMomentum() {
+        return 2*particle.mass*(particle.vx*Math.cos(alpha) + particle.vy*Math.sin(alpha));
+    }
 }

@@ -142,7 +142,7 @@ public class GasBox {
 
         out.write(numParticles + " " + holeSize + "\n");
 
-        out.write(time + " 1 0\n");
+        out.write(time + " 0 0\n");
         for (Particle particle : particles) {
             out.write(particle.x + " " + particle.y + " " + particle.vx + " " + particle.vy + "\n");
         }
@@ -164,7 +164,8 @@ public class GasBox {
 
             final double delta = event.getTime() - time;
             time = event.getTime();
-            out.write(time + " " + a + " " + (1 - a) + "\n");
+            Particle p = event.getParticles().get(0);
+            out.write(time + " " + (event instanceof CollisionEvent ? 0 : 1) + " " + event.getMomentum() + "\n");
 
             // Se evolucionan todas las partículas según sus ecuaciones de movimiento hasta tc .
             particles.parallelStream().forEach(particle -> {

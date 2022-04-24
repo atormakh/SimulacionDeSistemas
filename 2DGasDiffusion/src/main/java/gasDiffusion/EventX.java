@@ -19,4 +19,9 @@ public class EventX extends Event {
     public List<Particle> getParticles() {
         return Collections.singletonList(particle);
     }
+
+    @Override
+    public double getMomentum() {
+        return 2*particle.vx*particle.mass;
+    }
 }
