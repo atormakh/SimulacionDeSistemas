@@ -65,10 +65,10 @@ if __name__ == "__main__":
                         default=0.01, help="velocity")
     parser.add_argument("-t", "--timeMultiplier", type=float,
                         default=1, help="time multiplier")
-    parser.add_argument("-r", "--render", type=bool,
-                        default=False, help="Render ovito")
+    parser.add_argument("-nr", "--noRender", type=bool,
+                        default=True, help="Render ovito")
 
     args = parser.parse_args()
 
     run(args.numParticles, args.holeSize, args.seed,
-        args.threshold, args.maxIterations, args.velocity, args.timeMultiplier, True)
+        args.threshold, args.maxIterations, args.velocity, args.timeMultiplier, not args.notRender)
