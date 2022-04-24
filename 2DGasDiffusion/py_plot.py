@@ -6,7 +6,7 @@ def plotGraphs(data, N=2000, hole_size=0.03, f=False):
     count = []
     flow = []
     flow_actual = 0
-    for time, a, b, pr, t, _data in data:
+    for time, a, b, m, t, _data in data:
         count.append((a, b))
 
     plt.figure("Lattice Gas Particles", figsize=(10, 10))

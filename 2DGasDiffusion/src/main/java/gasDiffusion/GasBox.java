@@ -12,18 +12,22 @@ public class GasBox {
     int numParticles;
     double holeSize;
     float threshold;
-    Double BOX_HEIGHT = 0.09, BOX_WIDTH = 0.24, PARTICLE_MASS = 1.0, INITIAL_VELOCITY = 0.1, PARTICLE_RADIUS = 0.0015;
+    double initialVelocity;
+    double timeMultiplier;
+    Double BOX_HEIGHT = 0.09, BOX_WIDTH = 0.24, PARTICLE_MASS = 1.0, PARTICLE_RADIUS = 0.0015;
     Random random;
     List<Particle> particles;
     Queue<Event> queue;
     double time;
     Particle upDot, downDot;
 
-    public GasBox(double holeSize, int numParticles, int seed, float threshold) {
+    public GasBox(double holeSize, int numParticles, int seed, float threshold, double initialVelocity, double timeMultiplier) {
         this.holeSize = holeSize;
         this.numParticles = numParticles;
         this.random = new Random(seed);
         this.threshold = threshold;
+        this.initialVelocity = initialVelocity;
+        this.timeMultiplier = timeMultiplier;
         this.time = 0;
         particles = new ArrayList<>();
         queue = new ConcurrentLinkedDeque<>();
@@ -133,8 +137,8 @@ public class GasBox {
 
             double angle = random.nextDouble() * 2 * Math.PI;
 
-            double vx = INITIAL_VELOCITY * Math.cos(angle);
-            double vy = INITIAL_VELOCITY * Math.sin(angle);
+            double vx = initialVelocity * Math.cos(angle);
+            double vy = initialVelocity * Math.sin(angle);
 
             particles.add(new Particle(x, y, vx, vy, PARTICLE_MASS, PARTICLE_RADIUS));
         }
@@ -149,12 +153,12 @@ public class GasBox {
         calculateInitialEvents();
 
 
-        double a;
+        double a=1;
         int iter = 0;
         double start = System.currentTimeMillis();
-        while (iter <= maxIterations && Math.abs((a = calculateBalance(particles)) - 0.5) > threshold) {
-            iter++;
-
+        boolean equilibrium = false;
+        double lastTime = Double.MAX_VALUE;
+        while (iter <= maxIterations && time < lastTime) {
 
             queue.removeIf(e -> !e.isValid());
 
@@ -195,9 +199,13 @@ public class GasBox {
                 });
             });
 
-
             //Se calculan los nuevos eventos para las partículas que han chocado.
             event.getParticles().parallelStream().forEach(this::calculateEventsForParticle);
+
+            if(!equilibrium && calculateBalance(particles) - 0.5 < threshold) {
+                equilibrium = true;
+                lastTime = timeMultiplier * time;
+            }
 
 
         }

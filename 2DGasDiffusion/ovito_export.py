@@ -50,7 +50,7 @@ def generate_wall(width=0.24, height=0.09, hole_size=0.03):
 
 def save(filename, data, radius=0.0015):
     with open(filename, "w") as dump:
-        for time, a, b, pr, t, frame in data:
+        for time, a, b, m, t, frame in data:
             dump.write("{}\ncomment\n".format(len(frame)))
             for particle in frame:
                 x, y, vx, vy = particle
