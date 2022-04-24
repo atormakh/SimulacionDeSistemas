@@ -28,7 +28,8 @@ def run(N=2000, hole_size=0.02, seed=0, threshold=0.05, max_iterations=100000, v
 
     proc = os.popen(
         f"java -cp ../../target/gasDiffusion-1.0-SNAPSHOT.jar -DnumParticles={N} -DholeSize={hole_size} -Dseed={seed} -Dthreshold={threshold} -DmaxIterations={max_iterations} -DinitialVelocity={velocity} -DtimeMultiplier={time_multiplier} gasDiffusion.Main")
-    print(proc.readlines())
+    for line in proc.readlines():
+        print(line)
     # proc.readlines()
     print("FINISH JAVA")
     data = data_import.Data("2DGasDiffusion.txt")
@@ -53,22 +54,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run lattice gas simulation")
     parser.add_argument("-n", "--numParticles", type=int,
                         default=10, help="Number of particles")
-    parser.add_argument("-s", "--seed", type=int, default=1,
+    parser.add_argument("-s", "--seed", type=int, default=0,
                         help="Seed for random number generator")
     parser.add_argument("-hs", "--holeSize", type=float,
                         default=0.02, help="Hole size")
     parser.add_argument("-th", "--threshold", type=float,
                         default=0.05, help="threshold")
     parser.add_argument("-m", "--maxIterations", type=int,
-                        default=100000, help="max iterations")
+                        default=1500000, help="max iterations")
     parser.add_argument("-v", "--velocity", type=float,
                         default=0.01, help="velocity")
     parser.add_argument("-t", "--timeMultiplier", type=float,
                         default=1, help="time multiplier")
     parser.add_argument("-nr", "--noRender", type=bool,
-                        default=True, help="Render ovito")
+                        default=False, help="Render ovito")
 
     args = parser.parse_args()
 
     run(args.numParticles, args.holeSize, args.seed,
-        args.threshold, args.maxIterations, args.velocity, args.timeMultiplier, not args.notRender)
+        args.threshold, args.maxIterations, args.velocity, args.timeMultiplier, not args.noRender)

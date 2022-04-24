@@ -13,7 +13,7 @@ def plotGraphs(data, N=2000, hole_size=0.03, f=False):
 
     plt.figure("Difusión Gas", figsize=(10, 10))
     plt.plot(times,count)
-    plt.title("N={} and apertura={}m".format(N, hole_size))
+    #plt.title("N={} y apertura={}m".format(N, hole_size))
     plt.xlabel("Tiempo (s)")
     plt.ylabel("fp")
     plt.yticks(np.arange(0, 1.05, 0.05))
