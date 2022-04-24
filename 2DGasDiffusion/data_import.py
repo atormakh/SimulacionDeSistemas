@@ -17,7 +17,7 @@ class Data:
         self.event_t = 0
         self.is_wall_event = False
         self.event_momentum = 0
-        self.l = 0.24*2 + 0.09*2 + 2*(0.09 - 0.03)
+        self.l = 0.24*2 + 0.09*2 #+ 2*(0.09 - 0.03)
         self.update_header()
 
     def __iter__(self):
@@ -39,9 +39,11 @@ class Data:
 
     def __next__(self):
 
+        momentums_sum = 0
         
         while(self.t >= self.event_t):
             self.update_data()
+            if self.is_wall_event: momentums_sum += abs(self.event_momentum)
             self.update_header()
         
 
@@ -51,11 +53,14 @@ class Data:
         a = 0
         b = 0
 
+        temperature = 0
+
         dt = self.dt if self.event_t - self.t > self.dt else self.event_t - self.t
         for p in self.data:
             x, y, vx, vy = p
             if x < 0.24/2:
                 a += 1
+                temperature += vx**2 + vy**2
             data.append((x + vx*dt, y + vy*dt, vx, vy))
 
         a /= self.num_particles
@@ -64,9 +69,8 @@ class Data:
         self.t += self.dt
         old = self.data
         self.data = data
-        t = sum([vx*vx + vy*vy for x, y, vx, vy in data])
-        #pr = momentums_sum / (dt*self.l)
-        return self.t, a, b, old
+        pr = momentums_sum / (dt*self.l)
+        return self.t, a, b, pr, temperature, old
 
     def close(self):
         self.file.close()

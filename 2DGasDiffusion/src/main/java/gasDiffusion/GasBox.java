@@ -165,7 +165,7 @@ public class GasBox {
             final double delta = event.getTime() - time;
             time = event.getTime();
             Particle p = event.getParticles().get(0);
-            out.write(time + " " + (event instanceof CollisionEvent ? 0 : 1) + " " + event.getMomentum() + "\n");
+            out.write(time + " " + ((event instanceof CollisionEvent || event instanceof ObstacleEvent) ? 0 : 1) + " " + event.getMomentum() + "\n");
 
             // Se evolucionan todas las partículas según sus ecuaciones de movimiento hasta tc .
             particles.parallelStream().forEach(particle -> {
