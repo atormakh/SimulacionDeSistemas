@@ -8,4 +8,16 @@ public class Result {
         this.velocity = velocity;
         this.acceleration = acceleration;
     }
+
+    public double getPosition() {
+        return position;
+    }
+
+    public double getVelocity() {
+        return velocity;
+    }
+
+    public double getAcceleration() {
+        return acceleration;
+    }
 }
