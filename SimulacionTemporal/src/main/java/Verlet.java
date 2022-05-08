@@ -10,7 +10,7 @@ public class Verlet extends IntegrationMethod {
         super(forceFunction);
 
         this.current_pos = pos;
-        this.old_pos = current_pos;
+        this.old_pos = current_pos - dt * vel;
         this.current_vel = vel;
         this.mass = mass;
         this.dt = dt;
