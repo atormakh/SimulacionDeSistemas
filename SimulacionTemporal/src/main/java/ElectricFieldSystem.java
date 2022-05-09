@@ -10,10 +10,8 @@ public class ElectricFieldSystem {
         double dt = Double.parseDouble(System.getProperty("dt", "0.1"));
         double dt2 = Double.parseDouble(System.getProperty("dt2", "0.1"));
         double tf = Double.parseDouble(System.getProperty("tf", "4"));
-        double vx = Double.parseDouble(System.getProperty("vx", "5000"));
-        double vy = Double.parseDouble(System.getProperty("vy", "50000"));
+        double v = Double.parseDouble(System.getProperty("v", "5000"));
         double r = Double.parseDouble(System.getProperty("r", "0")); // y should be between -1 and 1
-        Map<String, IntegrationMethod> methods = new HashMap<>();
 
         dt *= 1e-12;
         dt2 *= 1e-12;
@@ -24,7 +22,7 @@ public class ElectricFieldSystem {
 
         ElectricFieldForce ElectricFieldForce = new ElectricFieldForce(N, D);
 
-        Vector2 initialVel = new Vector2(vx, vy);
+        Vector2 initialVel = new Vector2(v, 0);
         Vector2 initialPos = new Vector2(0, r * D + N * D / 2 - D/2);
 
         double mass = 1e-27;

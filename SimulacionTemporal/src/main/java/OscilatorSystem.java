@@ -34,8 +34,9 @@ public class OscilatorSystem {
         FileWriter out = new FileWriter("oscilator.txt");
 
         IntegrationMethod method = methods.get(methodName);
-        Result result;
-        for (double t = 0; t < tf; t += dt) {
+        Result result = new Result(initialPos,initialVel,0);
+        out.write(0 + " " + result.getPosition() + " " + result.getVelocity() + " " + result.getAcceleration() + "\n");
+        for (double t = dt; t < tf; t += dt) {
             result = method.get();
 
             if ((int) (t / dt) % (int) (dt2 / dt) == 0) {
