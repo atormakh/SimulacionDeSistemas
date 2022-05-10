@@ -27,7 +27,8 @@ public class ElectricFieldSystem {
 
         double mass = 1e-27;
 
-        Verlet2D verlet2D = new Verlet2D(ElectricFieldForce, initialPos, initialVel, mass, dt);
+        //Verlet2D verlet2D = new Verlet2D(ElectricFieldForce, initialPos, initialVel, mass, dt);
+        GearPredictor2D verlet2D = new GearPredictor2D(ElectricFieldForce, initialPos, initialVel, mass, dt);
 
         FileWriter out = new FileWriter("ElectricField.txt");
 
@@ -44,7 +45,7 @@ public class ElectricFieldSystem {
                 out.write(t + " " + pos.x + " " + pos.y + " " + vel.x + " " + vel.y + "\n");
             }
 
-            if (pos.x > (N + 1) * D || pos.x < -D || pos.y > N * D || pos.y < 0) {
+            if (pos.x > (N + 1) * D || pos.x < -D || pos.y > (N+1) * D || pos.y < -D) {
                 System.out.println("Particle escaped!");
                 break;
             }
