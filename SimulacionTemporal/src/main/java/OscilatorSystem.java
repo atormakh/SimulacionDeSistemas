@@ -9,13 +9,13 @@ public class OscilatorSystem {
     public static void main(String[] args) throws IOException {
 
         String methodName = System.getProperty("method", "Verlet");
-        double dt = Double.parseDouble(System.getProperty("dt", "1"));
-        double dt2 = Double.parseDouble(System.getProperty("dt2", "50"));
+        double dt = Double.parseDouble(System.getProperty("dt", "0.001"));
+        double dt2 = Double.parseDouble(System.getProperty("dt2", "0.05"));
         double tf = Double.parseDouble(System.getProperty("tf", "5"));
         Map<String, IntegrationMethod> methods = new HashMap<>();
 
-        dt *= 1e-3;
-        dt2 *= 1e-3;
+/*        dt *= 1e-3;
+        dt2 *= 1e-3;*/
 
         double k = Math.pow(10, 4);
         int mass = 70;

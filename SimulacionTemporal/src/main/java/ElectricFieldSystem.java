@@ -7,23 +7,28 @@ public class ElectricFieldSystem {
 
     public static void main(String[] args) throws IOException {
 
-        double dt = Double.parseDouble(System.getProperty("dt", "0.1"));
-        double dt2 = Double.parseDouble(System.getProperty("dt2", "0.1"));
-        double tf = Double.parseDouble(System.getProperty("tf", "4"));
+        double dt = Double.parseDouble(System.getProperty("dt", "0"));
+        double dt2 = Double.parseDouble(System.getProperty("dt2", "0"));
+        double tf = Double.parseDouble(System.getProperty("tf", "0"));
         double v = Double.parseDouble(System.getProperty("v", "5000"));
         double r = Double.parseDouble(System.getProperty("r", "0")); // y should be between -1 and 1
-
+/*
         dt *= 1e-12;
         dt2 *= 1e-12;
-        tf *= 1e-12;
+        tf *= 1e-12;*/
+
+        dt = dt == 0 ? 1e-12 : dt;
+        dt2 = dt2 == 0 ? 1e-12 : dt2;
+        tf = tf == 0 ? 1 : tf;
 
         int N = 16;
         double D = 1e-8;
+        int margin = 3;
 
         ElectricFieldForce ElectricFieldForce = new ElectricFieldForce(N, D);
 
         Vector2 initialVel = new Vector2(v, 0);
-        Vector2 initialPos = new Vector2(0, r * D + N * D / 2 - D/2);
+        Vector2 initialPos = new Vector2(0, r * D + N * D / 2 - D / 2);
 
         double mass = 1e-27;
 
@@ -45,13 +50,29 @@ public class ElectricFieldSystem {
                 out.write(t + " " + pos.x + " " + pos.y + " " + vel.x + " " + vel.y + "\n");
             }
 
-            if (pos.x > (N + 1) * D || pos.x < -D || pos.y > (N+1) * D || pos.y < -D) {
-                System.out.println("Particle escaped!");
+            if (pos.y > (N + margin) * D) {
+                System.out.println("1");
                 break;
             }
 
-            if (ElectricFieldForce.checkCollision(pos, 0.001 * D)) {
-                System.out.println("Particle collided!");
+            if (pos.x > (N + margin) * D) {
+                System.out.println("2");
+                break;
+            }
+
+            if ( pos.y < -margin * D) {
+                System.out.println("3");
+                break;
+            }
+
+            if(pos.x < -D * margin){
+                System.out.println("4");
+            }
+
+
+
+            if (ElectricFieldForce.checkCollision(pos, 0.01 * D)) {
+                System.out.println("0");
                 break;
             }
 
