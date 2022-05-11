@@ -1,6 +1,6 @@
 
 
-public class Verlet2D {
+public class Verlet2D extends Integration2DMethod {
 
     Vector2 current_pos, old_pos, current_vel;
     double mass;

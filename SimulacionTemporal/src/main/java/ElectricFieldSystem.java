@@ -7,6 +7,7 @@ public class ElectricFieldSystem {
 
     public static void main(String[] args) throws IOException {
 
+        String methodName = System.getProperty("method", "Verlet");
         double dt = Double.parseDouble(System.getProperty("dt", "0"));
         double dt2 = Double.parseDouble(System.getProperty("dt2", "0"));
         double tf = Double.parseDouble(System.getProperty("tf", "0"));
@@ -32,8 +33,12 @@ public class ElectricFieldSystem {
 
         double mass = 1e-27;
 
-        //Verlet2D verlet2D = new Verlet2D(ElectricFieldForce, initialPos, initialVel, mass, dt);
-        GearPredictor2D verlet2D = new GearPredictor2D(ElectricFieldForce, initialPos, initialVel, mass, dt);
+        Map<String, Integration2DMethod> methods = new HashMap<>();
+        methods.put("Gear",new GearPredictor2D(ElectricFieldForce, initialPos, initialVel, mass, dt));
+        methods.put("Verlet", new Verlet2D(ElectricFieldForce, initialPos, initialVel, mass, dt));
+
+        Integration2DMethod method = methods.get(methodName);
+
 
         FileWriter out = new FileWriter("ElectricField.txt");
 
@@ -41,7 +46,7 @@ public class ElectricFieldSystem {
         Vector2 pos, vel;
         out.write(0 + " " + initialPos.x + " " + initialPos.y + " " + initialVel.x + " " + initialVel.y + "\n");
         for (double t = dt; t < tf; t += dt) {
-            result = verlet2D.get();
+            result = method.get();
             pos = result.getPosition();
             vel = result.getVelocity();
 

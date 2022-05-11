@@ -1,4 +1,4 @@
-public class GearPredictor2D {
+public class GearPredictor2D extends Integration2DMethod {
 
     Vector2[] states;
     double[] predictionCoefficients;

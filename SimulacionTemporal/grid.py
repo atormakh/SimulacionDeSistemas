@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-K = 1e-10
+K = 1e10
 
 
 class Particle:
@@ -29,10 +29,7 @@ class Grid:
             c = 'r' if particle.q > 0 else 'b'
             plt.scatter(particle.x, particle.y, c=c, s=100)
 
-    def calculate_energy(self, x, y, vx, vy, m, q):
-        EK = vx**2 + vy**2
-        EK *= 0.5*m
-
+    def calculate_energy(self, x, y, q):
         EU = 0
         for particle in self.particles.flatten():
             dx = particle.x - x
@@ -41,6 +38,6 @@ class Grid:
             EU += particle.q/d
         EU *= K*q
 
-        return EK + EU
+        return EU
 
 
