@@ -24,7 +24,6 @@ public class ElectricFieldSystem {
 
         int N = 16;
         double D = 1e-8;
-        int margin = 3;
 
         ElectricFieldForce ElectricFieldForce = new ElectricFieldForce(N, D);
 
@@ -55,23 +54,24 @@ public class ElectricFieldSystem {
                 out.write(t + " " + pos.x + " " + pos.y + " " + vel.x + " " + vel.y + "\n");
             }
 
-            if (pos.y > (N + margin) * D) {
+            if (pos.y > N * D) {
                 System.out.println("1");
                 break;
             }
 
-            if (pos.x > (N + margin) * D) {
+            if (pos.x > (N + 1) * D) {
                 System.out.println("2");
                 break;
             }
 
-            if ( pos.y < -margin * D) {
+            if ( pos.y < 0) {
                 System.out.println("3");
                 break;
             }
 
-            if(pos.x < -D * margin){
+            if(pos.x < 0){
                 System.out.println("4");
+                break;
             }
 
 

@@ -32,7 +32,9 @@ public class GearPredictor extends IntegrationMethod {
         states[0] = pos;
         states[1] = vel;
         states[2] = forceFunction.getForce(pos, vel) / mass;
-
+        states[3] = forceFunction.getForce(states[1], states[2]) / mass;
+        states[4] = forceFunction.getForce(states[2], states[3]) / mass;
+        states[5] = forceFunction.getForce(states[3], states[4]) / mass;
 
         int factorial = 1;
         for (int i = 0; i < NUM_PREDICTIONS; i++) {
