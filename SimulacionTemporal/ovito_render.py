@@ -25,7 +25,7 @@ def animate():
     static.modifiers.append(grid_modifier)
     modifier = ovito.modifiers.GenerateTrajectoryLinesModifier(only_selected = False)
     particles.modifiers.append(modifier)
-    modifier.vis.width = 1e-10
+    modifier.vis.width = 5e-10
     modifier.vis.upto_current_time = True
     modifier.generate()
 
@@ -46,7 +46,10 @@ def animate():
     #ratio = y/x
     #size = 1000
     vp.render_anim(size=(600,600),
-                   filename="simulation.avi", fps=15, background=(0, 0, 0))
+                  filename="simulation.avi", fps=15, background=(0, 0, 0))
+    
+    vp.render_image(size=(1000,1000), filename="tray.png", background=(0,0,0), frame=particles.source.num_frames)
+
     static.remove_from_scene()
     particles.remove_from_scene()
 
