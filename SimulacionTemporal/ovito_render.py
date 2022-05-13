@@ -45,7 +45,7 @@ def animate():
 
     #ratio = y/x
     #size = 1000
-    vp.render_anim(size=(600,600),
+    vp.render_anim(size=(800,600),
                   filename="simulation.avi", fps=15, background=(0, 0, 0))
     
     vp.render_image(size=(1000,1000), filename="tray.png", background=(0,0,0), frame=particles.source.num_frames)
