@@ -7,10 +7,8 @@ public class Main {
 
 
     public static void main(String[] args) throws IOException {
-        System.out.println("Estan las notas");
-        FileWriter out = new FileWriter("ElectricField.txt");
+        FileWriter out = new FileWriter("zombies.txt");
 
-        int humansQuantity, zombiesQuantity;
 
         double dt = 1e-3;
         double outputDt = 50e-3;
@@ -18,17 +16,19 @@ public class Main {
         int Nh = 10;
         int frec = (int) (outputDt / dt);
         int recipientRadius = 11;
-        Environment environment = new Environment(dt, recipientRadius);
+
+        Environment environment = Environment.init(dt, recipientRadius);
 
 
         environment.addZombie();
 
         // add humans
         for (int i = 0; i < Nh; i++) {
-            environment.addHuman();
+            //environment.addHuman();
+            Nh = 0;
         }
 
-
+        out.write(Nh + 1 + "\n");
         for (int i = 1; i * dt < tf; i++) {
             if (i % frec == 0) {
                 //print to file
@@ -38,6 +38,8 @@ public class Main {
             environment.update();
 
         }
+
+        out.close();
 
 
     }

@@ -8,34 +8,48 @@ public class Environment {
     List<Entity> entities = new LinkedList<>();
     List<Zombie> zombies = new LinkedList<>();
     double inactiveZombieVelocity = 0.3;
+    double vz = 5;
+    double vh = 4;
     double initialZombieDistance = 1;
 
     double t = 0;
     double dt = 1e-3;
     double radius;
+    double Ap = 1;
+    double Bp = 1;
+
+    static Environment instance = null;
 
     public Environment(double dt, double radius) {
+        this.dt = dt;
         this.radius = radius;
+    }
+
+    public static Environment init(double dt, double radius){
+        instance = new Environment(dt, radius);
+        return instance;
+    }
+
+    public static Environment getInstance() {
+        return instance;
     }
 
     public void printToFile(FileWriter out) throws IOException {
         out.write(t + "\n");
         for (Entity entity : entities) {
-            char zombie = entity instanceof Zombie ? 'z' : 'h';
+            int zombie = entity instanceof Zombie ? 1 : 0;
             out.write(entity.position.x + " " + entity.position.y + " " + entity.velocity.x + " " + entity.velocity.y + " " + zombie + "\n");
         }
     }
 
     void addZombie() {
-        Zombie zombie = new Zombie(0, 0, inactiveZombieVelocity, activeZombieVelocity);
-        //Zombie zombie = new Zombie(new Vec2(0,0), new Vec2(inactiveZombieVelocity,inactiveZombieVelocity), new Vec2(0,0));
-
+        Zombie zombie = new Zombie(0, 0);
         entities.add(zombie);
         zombies.add(zombie);
     }
 
     void addHuman() {
-        Human human = new Human(0, 0, humanVel);
+        Human human = new Human(0, 0);
         do {
             double mod = Math.random() * radius;
             double angle = Math.random() * 2 * Math.PI;
@@ -65,24 +79,43 @@ public class Environment {
         return false;
     }
 
+    public void bounceIfNeeded(Entity e){
+        double d = e.position.norm();
+        if (d > radius) {
+            Vec2 n = e.position.normalize();
+            double normalComponent = n.dot(e.velocity);
+            e.velocity = e.velocity.sub(n.mul(2 * normalComponent));
+        }
+    }
+
     public void update() {
-        entities.stream().forEach((e)->{
-            if ( e instanceof Zombie) {
-                //Chequear si hay algun humano a menos de 4 o 5 metros de distancia
-                //Caso contrario seguir moviendose en la direccion en la que venia
-                for (Entity entity:entities){
-                    if(entity instanceof Human) {
-                        double dist = e.position.dist(entity.position) - e.radius - entity.radius;
-                        if (dist < 4) {
-                            //Zombie se activa y se mueve en esa direccion
-                        } else if (dist < 5) {
-                            //Zombie NO se activa pero se mueve en esa direccion
-                        }
-                    }
-                }
+        List<Entity> copy = new ArrayList<>(entities);
+        copy.forEach((e) -> {
+            e.update(dt);
+            bounceIfNeeded(e);
+            e.move(dt);
+        });
+        t+=dt;
 
-            }
-            });
+    }
 
+    public List<Entity> getAgents() {
+        return entities;
+    }
+
+    public void removeHuman(Human h) {
+        entities.remove(h);
+    }
+
+
+    public void addZombie(Zombie z) {
+        entities.add(z);
+        zombies.add(z);
+    }
+
+    protected Vec2  randomPosition() {
+        double mod = Math.random() * radius;
+        double angle = Math.random() * 2 * Math.PI;
+        return new Vec2(mod * Math.cos(angle), mod * Math.sin(angle));
     }
 }

@@ -1,16 +1,38 @@
+import java.util.List;
+
 public abstract class Entity {
     Vec2 position, velocity, acceleration;
     double radius;
-    double maxVel;
+    Environment environment = Environment.getInstance();
 
-    Vec2 desiredDirection;
+    Vec2 desiredPos;
 
 
-    protected Entity(Vec2 position,Vec2 velocity,Vec2 acceleration) {
-        this.position = position;
-        this.velocity = velocity;
-        this.acceleration = acceleration;
+    protected Entity(double x, double y) {
+        this.position = new Vec2(x, y);
+        this.velocity = new Vec2(0, 0);
+        this.acceleration = new Vec2(0, 0);
+        this.desiredPos = environment.randomPosition();
+        radius = 0.5;
+
     }
 
-    abstract void changeDirection(Vec2 velocity, Vec2 acceleration);
+
+
+    Vec2 calculateNc(Vec2 obstacle) {
+        double distance = obstacle.dist(position);
+        //cos(theta) = a.b/(||a||*||b||)
+        Vec2 obstacleVec = obstacle.sub(position).normalize();
+        Vec2 desiredVec = desiredPos.sub(position).normalize();
+        double cos = obstacleVec.dot(desiredVec);
+        double mod = environment.Ap * Math.exp(-distance / environment.Bp) * cos;
+
+        return obstacleVec.mul(-mod);
+    }
+
+    abstract void update(double dt);
+
+    public void move(double dt){
+        position = position.add(velocity.mul(dt));
+    }
 }

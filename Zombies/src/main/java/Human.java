@@ -1,10 +1,28 @@
-public class Human extends Entity{
-    public Human(Vec2 position, Vec2 velocity, Vec2 acceleration) {
-        super(position, velocity, acceleration);
+import java.util.List;
+
+public class Human extends Entity {
+    public Human(double x, double y) {
+        super(x, y);
     }
 
+
     @Override
-    void changeDirection(Vec2 velocity, Vec2 acceleration) {
+    void update(double dt) {
+        List<Entity> entities = environment.getAgents();
+        Vec2 nc = new Vec2(0, 0);
+
+        //set desired position
+
+        //Avoid Humans
+        for (Entity entity : entities) {
+            if (entity instanceof Human) {
+                nc = nc.add(calculateNc(entity.position));
+            }
+        }
+
+        //Wall avoidance
+
 
     }
 }
+
