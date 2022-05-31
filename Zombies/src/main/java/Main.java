@@ -11,8 +11,8 @@ public class Main {
 
 
         double dt = 1e-3;
-        double outputDt = 50e-3;
-        double tf = 15;
+        double outputDt = 100e-3;
+        double tf = 60*5;
         int Nh = 10;
         int frec = (int) (outputDt / dt);
         int recipientRadius = 11;
@@ -28,7 +28,7 @@ public class Main {
         }
 
         out.write(Nh + 1 + "\n");
-        for (int i = 1; i * dt < tf; i++) {
+        for (int i = 1; i * dt < tf && !environment.areAllZombies(); i++) {
             if (i % frec == 0) {
                 //print to file
                 environment.printToFile(out);

@@ -35,17 +35,8 @@ public class Zombie extends Entity {
         }
 
         //get closest human;
-        Human h = null;
-        double dh = Double.MAX_VALUE;
-        for (Entity entity : entities) {
-            if (entity instanceof Human) {
-                double d = position.dist(entity.position);
-                if (d < dh) {
-                    dh = d;
-                    h = (Human) entity;
-                }
-            }
-        }
+        Human h = getClosestHuman();
+        double dh = h==null? 0:h.position.dist(position);
 
         //set desired position to closest human
         if (h != null && dh < environment.zombieVision) {
@@ -67,29 +58,17 @@ public class Zombie extends Entity {
             }
         }
 
-
-        //Avoid other zombies
-        for (Entity entity : entities) {
-            if (entity instanceof Zombie && entity != this) {
-                nc = nc.add(calculateNc(entity.position));
-            }
+        Zombie z = getClosestZombie();
+        if(z!=this && z!=null && z.position.dist(position) <= r + z.r){
+            //desiredPos = environment.randomPosition();
+            //z.desiredPos = environment.randomPosition();
+            desiredPos = position.sub(z.position).normalize().add(position);
+            z.desiredPos = z.position.sub(position).normalize().add(z.position);
+            if(desiredPos.norm() >= environment.radius) desiredPos = environment.randomPosition();
+            if(z.desiredPos.norm() >= environment.radius) z.desiredPos = environment.randomPosition();
         }
 
-        //Wall avoidance
-        Vec2 wall = environment.getClosestWall(position);
-        if(wall != null) {
-            nc = nc.add(calculateNc(wall));
-        }
-
-
-        //update
-        Vec2 eit = desiredPos.sub(position).normalize();
-        Vec2 eia = nc.add(eit).normalize();
-
-        double mod = desiredVelocity * Math.pow((r - environment.rmin) / (environment.rmax - environment.rmin), environment.beta);
-        if (r < environment.rmax) r = r + environment.rmax * dt / environment.tau;
-        velocity = eia.mul(mod);
-        position = position.add(velocity.mul(dt));
+        move(dt);
 
 
     }

@@ -21,8 +21,8 @@ class Data:
         data = []
 
         for j in range(self.N):
-            x, y, vx, vy, type = map(float, parse(self.file.readline()))
-            data.append((x, y, vx, vy, type))
+            x, y, r, type = map(float, parse(self.file.readline()))
+            data.append((x, y, r, type))
 
     
 

@@ -37,4 +37,10 @@ public class Vec2 {
     public Vec2 add(Vec2 calculateNc) {
         return new Vec2(this.x+calculateNc.x, this.y+calculateNc.y);
     }
+
+    public Vec2 rotate(double v) {
+        double x = this.x*Math.cos(v) - this.y*Math.sin(v);
+        double y = this.x*Math.sin(v) + this.y*Math.cos(v);
+        return new Vec2(x,y);
+    }
 }

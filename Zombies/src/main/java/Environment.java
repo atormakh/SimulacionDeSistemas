@@ -44,7 +44,7 @@ public class Environment {
         out.write(t + "\n");
         for (Entity entity : entities) {
             int zombie = entity instanceof Zombie ? 1 : 0;
-            out.write(entity.position.x + " " + entity.position.y + " " + entity.velocity.x + " " + entity.velocity.y + " " + zombie + "\n");
+            out.write(entity.position.x + " " + entity.position.y + " " + entity.r + " " + zombie + "\n");
         }
     }
 
@@ -69,6 +69,10 @@ public class Environment {
 
     }
 
+    public boolean areAllZombies(){
+        return entities.size() == zombies.size();
+    }
+
     private boolean isColliding(Entity entity) {
         for (Entity e : entities) {
             if (e.position.dist(entity.position) < (e.r + entity.r)) return true;
@@ -82,15 +86,6 @@ public class Environment {
                 return true;
         }
         return false;
-    }
-
-    public void bounceIfNeeded(Entity e) {
-        double d = e.position.norm();
-        if (d > radius) {
-            Vec2 n = e.position.normalize();
-            double normalComponent = n.dot(e.velocity);
-            e.velocity = e.velocity.sub(n.mul(2 * normalComponent));
-        }
     }
 
     public void update() {
@@ -125,7 +120,7 @@ public class Environment {
     }
 
     public Vec2 getClosestWall(Vec2 position) {
-        if(position.x == 0 && position.y == 0) return null;
+        if(position.x == 0 && position.y == 0) return new Vec2(radius,0);
         return position.normalize().mul(radius);
     }
 }

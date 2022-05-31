@@ -13,22 +13,29 @@ def update(frame):
     time, data = frame
     print(time)
 
+    plt.cla()
 
     X = []
     Y = []
     c = []
+    r = []
 
-    for x, y, vx, vy, type in data:
+    for x, y,ra, type in data:
         X.append(x)
         Y.append(y)
-        c.append(type+1)
+        r.append(ra)
+        color = 'g' if type == 1 else 'b'
+        c.append(color)
+
+        circ = plt.Circle((x, y), radius=ra, color=color, fill=True)
+        plt.gca().add_patch(circ)
     
-    plt.cla()
+
     circle = plt.Circle((0, 0), radius , color='r', fill=False)
 
     plt.gca().add_patch(circle)
 
-    plt.scatter(X, Y, c=c, s=10)
+    #plt.scatter(X, Y, c=c, s=100)
 
     plt.ylim(-radius-1, radius+1)
     plt.xlim(-radius-1, radius+1)
