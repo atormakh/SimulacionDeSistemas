@@ -16,8 +16,8 @@ class Data:
         if not header:
             raise StopIteration
 
-        time = map(float, parse(header))
-
+        #time = map(float, parse(header))
+        time = float(header)
         data = []
 
         for j in range(self.N):

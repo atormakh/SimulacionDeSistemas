@@ -2,7 +2,8 @@ import java.util.List;
 
 public abstract class Entity {
     Vec2 position, velocity, acceleration;
-    double radius;
+    double desiredVelocity = 0;
+    double r;
     Environment environment = Environment.getInstance();
 
     Vec2 desiredPos;
@@ -13,10 +14,9 @@ public abstract class Entity {
         this.velocity = new Vec2(0, 0);
         this.acceleration = new Vec2(0, 0);
         this.desiredPos = environment.randomPosition();
-        radius = 0.5;
+        r = environment.rmin;
 
     }
-
 
 
     Vec2 calculateNc(Vec2 obstacle) {
@@ -32,7 +32,4 @@ public abstract class Entity {
 
     abstract void update(double dt);
 
-    public void move(double dt){
-        position = position.add(velocity.mul(dt));
-    }
 }

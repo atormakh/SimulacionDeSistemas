@@ -24,8 +24,7 @@ public class Main {
 
         // add humans
         for (int i = 0; i < Nh; i++) {
-            //environment.addHuman();
-            Nh = 0;
+            environment.addHuman();
         }
 
         out.write(Nh + 1 + "\n");

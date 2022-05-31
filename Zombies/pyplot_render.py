@@ -11,6 +11,7 @@ radius = 11
 
 def update(frame):
     time, data = frame
+    print(time)
 
 
     X = []
@@ -20,7 +21,7 @@ def update(frame):
     for x, y, vx, vy, type in data:
         X.append(x)
         Y.append(y)
-        c.append(type)
+        c.append(type+1)
     
     plt.cla()
     circle = plt.Circle((0, 0), radius , color='r', fill=False)
@@ -37,8 +38,9 @@ def update(frame):
 
 anim = FuncAnimation(plt.gcf(), update, data, interval = 1)
 
-plt.show()
+#anim.save("zombies.mp4", writer="imagemagick")
 
+plt.show()
 
 
 

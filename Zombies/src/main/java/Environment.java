@@ -17,7 +17,13 @@ public class Environment {
     double radius;
     double Ap = 1;
     double Bp = 1;
+    double rmin = 0.15;
+    double rmax = 0.32;
+    double beta = 0.9;
+    double tau = 0.5;
 
+    double eatingTime = 7;
+    double zombieVision = 4;
     static Environment instance = null;
 
     public Environment(double dt, double radius) {
@@ -25,7 +31,7 @@ public class Environment {
         this.radius = radius;
     }
 
-    public static Environment init(double dt, double radius){
+    public static Environment init(double dt, double radius) {
         instance = new Environment(dt, radius);
         return instance;
     }
@@ -53,11 +59,10 @@ public class Environment {
         do {
             double mod = Math.random() * radius;
             double angle = Math.random() * 2 * Math.PI;
-            human.radius = Math.random();
             human.position.x = mod * Math.cos(angle);
             human.position.y = mod * Math.sin(angle);
 
-        } while (!nearZombie(human) && !isColliding(human));
+        } while (nearZombie(human) || isColliding(human));
 
         entities.add(human);
 
@@ -66,20 +71,20 @@ public class Environment {
 
     private boolean isColliding(Entity entity) {
         for (Entity e : entities) {
-            if (e.position.dist(entity.position) < (e.radius + entity.radius)) return true;
+            if (e.position.dist(entity.position) < (e.r + entity.r)) return true;
         }
         return false;
     }
 
     private boolean nearZombie(Entity entity) {
         for (Zombie zombie : zombies) {
-            if (zombie.position.dist(entity.position) < (initialZombieDistance + entity.radius + entity.radius))
+            if (zombie.position.dist(entity.position) < (initialZombieDistance + entity.r + zombie.r))
                 return true;
         }
         return false;
     }
 
-    public void bounceIfNeeded(Entity e){
+    public void bounceIfNeeded(Entity e) {
         double d = e.position.norm();
         if (d > radius) {
             Vec2 n = e.position.normalize();
@@ -92,10 +97,10 @@ public class Environment {
         List<Entity> copy = new ArrayList<>(entities);
         copy.forEach((e) -> {
             e.update(dt);
-            bounceIfNeeded(e);
-            e.move(dt);
+            //bounceIfNeeded(e);
+            //e.move(dt);
         });
-        t+=dt;
+        t += dt;
 
     }
 
@@ -113,9 +118,14 @@ public class Environment {
         zombies.add(z);
     }
 
-    protected Vec2  randomPosition() {
+    protected Vec2 randomPosition() {
         double mod = Math.random() * radius;
         double angle = Math.random() * 2 * Math.PI;
         return new Vec2(mod * Math.cos(angle), mod * Math.sin(angle));
+    }
+
+    public Vec2 getClosestWall(Vec2 position) {
+        if(position.x == 0 && position.y == 0) return null;
+        return position.normalize().mul(radius);
     }
 }

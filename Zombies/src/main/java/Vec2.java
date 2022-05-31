@@ -22,6 +22,7 @@ public class Vec2 {
 
     public Vec2 normalize(){
         double norm = this.norm();
+        if(norm == 0) return new Vec2(0,0);
         return new Vec2(x/norm, y/norm);
     }
 
