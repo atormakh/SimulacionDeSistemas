@@ -29,7 +29,7 @@ public class Main {
         }
 
         out.write(Nh + 1 + "\n");
-        for (int i = 1; i * dt < tf && !environment.areAllZombies(); i++) {
+        for (int i = 1; i * dt < tf; i++) {
             if (i % frec == 0) {
                 //print to file
                 environment.printToFile(out);
