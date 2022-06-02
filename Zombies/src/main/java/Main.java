@@ -14,7 +14,7 @@ public class Main {
         double outputDt = Double.parseDouble(System.getProperty("outputDt", "100e-3"));
         double tf = Double.parseDouble(System.getProperty("tf", "300"));
         double vz = Double.parseDouble(System.getProperty("vz", "3"));
-        int Nh = Integer.parseInt(System.getProperty("nh", "10"));
+        int Nh = Integer.parseInt(System.getProperty("nh", "100"));
         int frec = (int) (outputDt / dt);
         int recipientRadius = 11;
 

@@ -44,6 +44,8 @@ public class Environment {
 
     public void printToFile(FileWriter out) throws IOException {
         out.write(t + " " + zombies.size() + " " + humans.size() + "\n");
+        if(entities.size() != 101)
+            System.out.println("entities.size() = " + entities.size());
         for (Entity entity : entities) {
             int zombie = entity instanceof Zombie ? 1 : 0;
             out.write(entity.position.x + " " + entity.position.y + " " + entity.r + " " + zombie + "\n");
@@ -92,6 +94,8 @@ public class Environment {
     }
 
     public void update() {
+        entities.forEach(Entity::clearNeighbours);
+        CellIndexMethod.call(this.entities, zombieVision, 2*radius, 0, false);
         List<Entity> copy = new ArrayList<>(entities);
         copy.forEach((e) -> {
             e.update(dt);

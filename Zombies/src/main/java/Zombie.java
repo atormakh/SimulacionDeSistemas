@@ -15,9 +15,6 @@ public class Zombie extends Entity {
 
     @Override
     void update(double dt) {
-        List<Entity> entities = environment.getAgents();
-        Vec2 nc = new Vec2(0, 0);
-
         //check if converting
         if (converting) return;
 
@@ -40,7 +37,7 @@ public class Zombie extends Entity {
 
         //set desired position to closest human
         if (h != null && dh < environment.zombieVision) {
-            if (dh < h.r + r) { //if human is close enough to eat
+            if (dh < h.r + r && environment.humans.contains(h)) { //if human is close enough to eat
                 eating = true;
                 environment.removeHuman(h);
                 Zombie z = new Zombie(h.position.x, h.position.y);

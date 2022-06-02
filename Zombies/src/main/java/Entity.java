@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Entity {
@@ -8,23 +9,73 @@ public abstract class Entity {
 
     Vec2 desiredPos;
 
+    Human closestHuman;
+    Zombie closestZombie;
+    double timestamp;
+
+    List<Entity> neighbours;
+
+    public void addNeighbour(Entity entity) {
+        neighbours.add(entity);
+    }
+
+    public void clearNeighbours() {
+        neighbours.clear();
+        closestHuman = null;
+        closestZombie = null;
+    }
+
+    public double getR() {
+        return r;
+    }
+
+    public void checkNeighbours(){
+        double dz = Double.MAX_VALUE;
+        double dh = Double.MAX_VALUE;
+        closestHuman = null;
+        closestZombie = null;
+        for (Entity entity : neighbours) {
+            if (entity instanceof Zombie && position.dist(entity.position) < dz) {
+                dz = position.dist(entity.position);
+                closestZombie = (Zombie) entity;
+            }
+            if (entity instanceof Human && position.dist(entity.position) < dh) {
+                dh = position.dist(entity.position);
+                closestHuman = (Human) entity;
+            }
+        }
+        timestamp = environment.t;
+    }
 
     protected Zombie getClosestZombie() {
-        Zombie z = null;
+
+        if (environment.t != timestamp)
+            checkNeighbours();
+        return closestZombie;
+
+    /*    Zombie z = null;
         double dz = Double.MAX_VALUE;
 
         for (Zombie zombie : environment.zombies) {
-            if(zombie == this) continue;
+            if (zombie == this) continue;
             double d = position.dist(zombie.position);
             if (d < dz) {
                 dz = d;
                 z = zombie;
             }
         }
-        return z;
+        zombtimestamp = environment.t;
+        closestZombie = z;
+        return z;*/
     }
 
     protected Human getClosestHuman() {
+        if (environment.t != timestamp)
+            checkNeighbours();
+        return closestHuman;
+       /* if (environment.t == humantimestamp) {
+            return closestHuman;
+        }
         Human h = null;
         double dh = Double.MAX_VALUE;
         for (Human human : environment.humans) {
@@ -36,7 +87,9 @@ public abstract class Entity {
                 }
             }
         }
-        return h;
+        humantimestamp = environment.t;
+        closestHuman = h;
+        return h;*/
     }
 
     protected Vec2 handleCollisions() {
@@ -46,13 +99,9 @@ public abstract class Entity {
         if (wall != null && position.dist(wall) < r)
             escapeVel = wall.sub(position).normalize().mul(-environment.vh);
         if (escapeVel == null) {
-            for (Entity entity : environment.entities) {
-                if (this.getClass() == entity.getClass() && entity != this) {
-                    if (position.dist(entity.position) < r + entity.r) {
-                        escapeVel = position.sub(entity.position).normalize().mul(environment.vh);
-                        break;
-                    }
-                }
+            Entity entity = this instanceof Human ? getClosestHuman() : getClosestZombie();
+            if (entity !=null && position.dist(entity.position) < r + entity.r) {
+                escapeVel = position.sub(entity.position).normalize().mul(environment.vh);
             }
         }
         return escapeVel;
@@ -62,7 +111,7 @@ public abstract class Entity {
         Vec2 obstacle = environment.getClosestWall(position);
         Entity e = this instanceof Human ? getClosestHuman() : getClosestZombie();
 
-        obstacle = e!=null && e.position.dist(position) < obstacle.dist(position) ? e.position : obstacle;
+        obstacle = e != null && e.position.dist(position) < obstacle.dist(position) ? e.position : obstacle;
 
         return calculateNc(obstacle);
     }
@@ -89,6 +138,7 @@ public abstract class Entity {
         this.velocity = new Vec2(0, 0);
         this.acceleration = new Vec2(0, 0);
         this.desiredPos = environment.randomPosition();
+        this.neighbours = new ArrayList<>();
         r = environment.rmin;
 
     }
@@ -106,5 +156,4 @@ public abstract class Entity {
     }
 
     abstract void update(double dt);
-
 }
