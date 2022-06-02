@@ -7,13 +7,14 @@ import java.util.List;
 public class Environment {
     List<Entity> entities = new LinkedList<>();
     List<Zombie> zombies = new LinkedList<>();
+    List<Human> humans = new LinkedList<>();
     double inactiveZombieVelocity = 0.3;
-    double vz = 5;
+    double vz;
     double vh = 4;
     double initialZombieDistance = 1;
 
     double t = 0;
-    double dt = 1e-3;
+    double dt;
     double radius;
     double Ap = 1;
     double Bp = 1;
@@ -26,13 +27,14 @@ public class Environment {
     double zombieVision = 4;
     static Environment instance = null;
 
-    public Environment(double dt, double radius) {
+    public Environment(double dt, double radius, double vz) {
         this.dt = dt;
         this.radius = radius;
+        this.vz = vz;
     }
 
-    public static Environment init(double dt, double radius) {
-        instance = new Environment(dt, radius);
+    public static Environment init(double dt, double radius, double vz) {
+        instance = new Environment(dt, radius, vz);
         return instance;
     }
 
@@ -41,7 +43,7 @@ public class Environment {
     }
 
     public void printToFile(FileWriter out) throws IOException {
-        out.write(t + "\n");
+        out.write(t + " " + zombies.size() + " " + humans.size() + "\n");
         for (Entity entity : entities) {
             int zombie = entity instanceof Zombie ? 1 : 0;
             out.write(entity.position.x + " " + entity.position.y + " " + entity.r + " " + zombie + "\n");
@@ -65,6 +67,7 @@ public class Environment {
         } while (nearZombie(human) || isColliding(human));
 
         entities.add(human);
+        humans.add(human);
 
 
     }
@@ -105,6 +108,7 @@ public class Environment {
 
     public void removeHuman(Human h) {
         entities.remove(h);
+        humans.remove(h);
     }
 
 

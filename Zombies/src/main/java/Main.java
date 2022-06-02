@@ -10,14 +10,15 @@ public class Main {
         FileWriter out = new FileWriter("zombies.txt");
 
 
-        double dt = 1e-3;
-        double outputDt = 100e-3;
-        double tf = 60*5;
-        int Nh = 10;
+        double dt = Double.parseDouble(System.getProperty("dt", "1e-3"));
+        double outputDt = Double.parseDouble(System.getProperty("outputDt", "100e-3"));
+        double tf = Double.parseDouble(System.getProperty("tf", "300"));
+        double vz = Double.parseDouble(System.getProperty("vz", "3"));
+        int Nh = Integer.parseInt(System.getProperty("nh", "10"));
         int frec = (int) (outputDt / dt);
         int recipientRadius = 11;
 
-        Environment environment = Environment.init(dt, recipientRadius);
+        Environment environment = Environment.init(dt, recipientRadius, vz);
 
 
         environment.addZombie();
@@ -32,12 +33,14 @@ public class Main {
             if (i % frec == 0) {
                 //print to file
                 environment.printToFile(out);
+
+                System.out.print(String.format("\r%.2f", i * dt / tf * 100) + "% ");
             }
 
             environment.update();
 
         }
-
+        environment.printToFile(out);
         out.close();
 
 

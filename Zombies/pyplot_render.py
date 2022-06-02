@@ -10,7 +10,7 @@ data = data_import.Data("zombies.txt")
 radius = 11
 
 def update(frame):
-    time, data = frame
+    time,z,h, data = frame
     print(time)
 
     plt.cla()
@@ -43,9 +43,10 @@ def update(frame):
 
 
 
-anim = FuncAnimation(plt.gcf(), update, data, interval = 1)
+anim = FuncAnimation(plt.gcf(), update, data, interval = 1, save_count=1e5)
 
-#anim.save("zombies.mp4", writer="imagemagick")
+
+#anim.save("zombies.mp4", writer="ffmpeg", fps=15)
 
 plt.show()
 

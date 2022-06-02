@@ -16,17 +16,15 @@ class Data:
         if not header:
             raise StopIteration
 
-        #time = map(float, parse(header))
-        time = float(header)
+        time, z, h = map(float, parse(header))
+        #time = float(header)
         data = []
 
         for j in range(self.N):
             x, y, r, type = map(float, parse(self.file.readline()))
             data.append((x, y, r, type))
 
-    
-
-        return time, data
+        return time, z, h, data
 
     def close(self):
         self.file.close()

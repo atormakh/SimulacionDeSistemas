@@ -9,9 +9,6 @@ public class Human extends Entity {
 
     @Override
     void update(double dt) {
-        List<Entity> entities = environment.getAgents();
-        Vec2 nc = new Vec2(0, 0);
-
         //set desired position avoid zombies
 
         Zombie z = getClosestZombie();
@@ -19,7 +16,7 @@ public class Human extends Entity {
 
         if (z != null && dz <= environment.zombieVision) {
             desiredPos = position.sub(z.position).normalize().add(position);
-            if(desiredPos.norm() > environment.radius){
+            if(desiredPos.norm() > environment.radius){ //if desiredPos is outside of the environment, rotate it
                 Vec2 radial = position.normalize();
                 Vec2 tang = radial.rotate(-Math.PI/2);
                 desiredPos = tang.mul(desiredPos.dot(tang)).add(position);

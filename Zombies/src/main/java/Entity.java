@@ -27,12 +27,12 @@ public abstract class Entity {
     protected Human getClosestHuman() {
         Human h = null;
         double dh = Double.MAX_VALUE;
-        for (Entity entity : environment.entities) {
-            if (entity instanceof Human && entity != this) {
-                double d = position.dist(entity.position);
+        for (Human human : environment.humans) {
+            if (human != this) {
+                double d = position.dist(human.position);
                 if (d < dh) {
                     dh = d;
-                    h = (Human) entity;
+                    h = human;
                 }
             }
         }
