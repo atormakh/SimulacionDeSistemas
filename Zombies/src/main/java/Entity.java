@@ -8,23 +8,36 @@ public abstract class Entity {
 
     Vec2 desiredPos;
 
+    Human closestHuman;
+    Zombie closestZombie;
+    double humantimestamp = -1;
+    double zombietimestamp = -1;
+
 
     protected Zombie getClosestZombie() {
+
+        if (zombietimestamp == environment.t)
+            return closestZombie;
+
         Zombie z = null;
         double dz = Double.MAX_VALUE;
 
         for (Zombie zombie : environment.zombies) {
-            if(zombie == this) continue;
+            if (zombie == this) continue;
             double d = position.dist(zombie.position);
             if (d < dz) {
                 dz = d;
                 z = zombie;
             }
         }
+        closestZombie = z;
+        zombietimestamp = environment.t;
         return z;
     }
 
     protected Human getClosestHuman() {
+        if (humantimestamp == environment.t)
+            return closestHuman;
         Human h = null;
         double dh = Double.MAX_VALUE;
         for (Human human : environment.humans) {
@@ -36,6 +49,8 @@ public abstract class Entity {
                 }
             }
         }
+        closestHuman = h;
+        humantimestamp = environment.t;
         return h;
     }
 
@@ -46,25 +61,48 @@ public abstract class Entity {
         if (wall != null && position.dist(wall) < r)
             escapeVel = wall.sub(position).normalize().mul(-environment.vh);
         if (escapeVel == null) {
-            for (Entity entity : environment.entities) {
+            Entity entity = this instanceof Human ? getClosestHuman() : getClosestZombie();
+            if (entity != null && position.dist(entity.position) < r + entity.r) escapeVel = position.sub(entity.position).normalize().mul(environment.vh);
+           /* for (Entity entity : environment.entities) {
                 if (this.getClass() == entity.getClass() && entity != this) {
                     if (position.dist(entity.position) < r + entity.r) {
                         escapeVel = position.sub(entity.position).normalize().mul(environment.vh);
                         break;
                     }
                 }
-            }
+            }*/
         }
         return escapeVel;
     }
 
     protected Vec2 handleAvoidance() {
-        Vec2 obstacle = environment.getClosestWall(position);
+
+        Vec2 nc = new Vec2(0, 0);
+        if (this instanceof Zombie) return new Vec2(0, 0);
+        else{
+            nc = nc.add(calculateNc(environment.getClosestWall(position), environment.wallAp, environment.wallBp));
+            nc = nc.add(calculateNc(getClosestZombie().position, environment.zombieAp, environment.zombieBp));
+            Human h = getClosestHuman();
+            if (h != null) nc = nc.add(calculateNc(getClosestHuman().position, environment.entityAp, environment.entityBp));
+
+        }
+        /*nc = nc.add(calculateNc(environment.getClosestWall(position), environment.wallAp, environment.wallBp));
+        List<? extends Entity> entities = this instanceof Human ? environment.humans : environment.zombies;
+        for (Entity entity : entities) {
+            nc = nc.add(calculateNc(entity.position, environment.entityAp, environment.entityBp));
+        }
+
+        if (this instanceof Human) {
+            nc = nc.add(calculateNc(getClosestZombie().position, environment.zombieAp, environment.zombieBp));
+        }*/
+        return nc;
+
+        /* Vec2 obstacle = environment.getClosestWall(position);
         Entity e = this instanceof Human ? getClosestHuman() : getClosestZombie();
 
         obstacle = e!=null && e.position.dist(position) < obstacle.dist(position) ? e.position : obstacle;
 
-        return calculateNc(obstacle);
+        return calculateNc(obstacle);*/
     }
 
     protected void move(double dt) {
@@ -94,13 +132,13 @@ public abstract class Entity {
     }
 
 
-    Vec2 calculateNc(Vec2 obstacle) {
+    Vec2 calculateNc(Vec2 obstacle, double Ap, double Bp) {
         double distance = obstacle.dist(position);
         //cos(theta) = a.b/(||a||*||b||)
         Vec2 obstacleVec = obstacle.sub(position).normalize();
         Vec2 desiredVec = desiredPos.sub(position).normalize();
         double cos = obstacleVec.dot(desiredVec);
-        double mod = environment.Ap * Math.exp(-distance / environment.Bp) * cos;
+        double mod = Math.abs(Ap * Math.exp(-distance / Bp) * cos);
 
         return obstacleVec.mul(-mod);
     }

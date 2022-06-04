@@ -10,11 +10,11 @@ public class Main {
         FileWriter out = new FileWriter("zombies.txt");
 
 
-        double dt = Double.parseDouble(System.getProperty("dt", "1e-3"));
-        double outputDt = Double.parseDouble(System.getProperty("outputDt", "100e-3"));
+        double dt = Double.parseDouble(System.getProperty("dt", "1e-2"));
+        double outputDt = Double.parseDouble(System.getProperty("outputDt", "2e-1"));
         double tf = Double.parseDouble(System.getProperty("tf", "300"));
         double vz = Double.parseDouble(System.getProperty("vz", "3"));
-        int Nh = Integer.parseInt(System.getProperty("nh", "10"));
+        int Nh = Integer.parseInt(System.getProperty("nh", "100"));
         int frec = (int) (outputDt / dt);
         int recipientRadius = 11;
 
@@ -29,7 +29,7 @@ public class Main {
         }
 
         out.write(Nh + 1 + "\n");
-        for (int i = 1; i * dt < tf; i++) {
+        for (int i = 1; i * dt < tf && !environment.areAllZombies(); i++) {
             if (i % frec == 0) {
                 //print to file
                 environment.printToFile(out);

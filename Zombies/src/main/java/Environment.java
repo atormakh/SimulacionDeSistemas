@@ -16,8 +16,12 @@ public class Environment {
     double t = 0;
     double dt;
     double radius;
-    double Ap = 1;
-    double Bp = 1;
+    double entityAp = 300;
+    double entityBp = 0.15;
+    double wallAp = 500;
+    double wallBp = 0.3;
+    double zombieAp = 3000;
+    double zombieBp = 0.3;
     double rmin = 0.15;
     double rmax = 0.32;
     double beta = 0.9;
@@ -46,7 +50,9 @@ public class Environment {
         out.write(t + " " + zombies.size() + " " + humans.size() + "\n");
         for (Entity entity : entities) {
             int zombie = entity instanceof Zombie ? 1 : 0;
-            out.write(entity.position.x + " " + entity.position.y + " " + entity.r + " " + zombie + "\n");
+            out.write(entity.position.x + " " + entity.position.y
+                    + " " + entity.desiredPos.x + " " + entity.desiredPos.y
+                    + " " + entity.r + " " + zombie + "\n");
         }
     }
 

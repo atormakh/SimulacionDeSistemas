@@ -1,4 +1,3 @@
-import java.util.List;
 
 public class Human extends Entity {
     public Human(double x, double y) {
@@ -16,15 +15,17 @@ public class Human extends Entity {
 
         if (z != null && dz <= environment.zombieVision) {
             desiredPos = position.sub(z.position).normalize().add(position);
-            if(desiredPos.norm() > environment.radius){ //if desiredPos is outside of the environment, rotate it
-                Vec2 radial = position.normalize();
-                Vec2 tang = radial.rotate(-Math.PI/2);
-                desiredPos = tang.mul(desiredPos.dot(tang)).add(position);
-                //desiredPos = desiredPos.rotate(Math.PI/2);
-            }
         }
-        else
+        else {
+            //Human h = getClosestHuman();
+            //if (h!=null && h.position.dist(position) <= environment.zombieVision) {
+            //    desiredPos = position.sub(h.position).normalize().mul(1).add(position);
+            //}else
+            //    desiredPos = position;
+
             r = environment.rmin;
+            desiredPos = position;
+        }
 
 
 

@@ -21,8 +21,8 @@ class Data:
         data = []
 
         for j in range(self.N):
-            x, y, r, type = map(float, parse(self.file.readline()))
-            data.append((x, y, r, type))
+            x, y, dx, dy, r, type = map(float, parse(self.file.readline()))
+            data.append((x, y, dx, dy, r, type))
 
         return time, z, h, data
 
