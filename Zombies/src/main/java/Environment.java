@@ -79,6 +79,11 @@ public class Environment {
 
     }
 
+    void addHuman(Human human) {
+        entities.add(human);
+        humans.add(human);
+    }
+
     public boolean areAllSame(){
         return zombies.size() == 0 || humans.size()==0;
     }
@@ -136,6 +141,11 @@ public class Environment {
     }
 
     public void killZombie(Zombie zombie) {
+        zombies.remove(zombie);
+    }
+
+    public void removeZombie(Zombie zombie) {
+        entities.remove(zombie);
         zombies.remove(zombie);
     }
 }
