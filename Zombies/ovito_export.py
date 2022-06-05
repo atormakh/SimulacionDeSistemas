@@ -15,7 +15,7 @@ def save(filename, data):
             dump.write("{}\ncomment\n".format(len(frame)))
             for particle in frame:
                 x, y, dx, dy, ra, type = particle
-                red = 0 if type == 1 else 1
+                red = 1 if type == 0 else 0
                 green = 1 if type == 1 else 0
                 dump.write("{} {} {} {} {}\n".format(x, y, ra, red, green))
     dump.close()

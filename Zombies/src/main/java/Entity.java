@@ -13,6 +13,8 @@ public abstract class Entity {
     double humantimestamp = -1;
     double zombietimestamp = -1;
 
+    int type;
+
 
     protected Zombie getClosestZombie() {
 
@@ -81,7 +83,8 @@ public abstract class Entity {
         if (this instanceof Zombie) return new Vec2(0, 0);
         else{
             nc = nc.add(calculateNc(environment.getClosestWall(position), environment.wallAp, environment.wallBp));
-            nc = nc.add(calculateNc(getClosestZombie().position, environment.zombieAp, environment.zombieBp));
+            Zombie z = getClosestZombie();
+            if (z != null) nc = nc.add(calculateNc(z.position, environment.zombieAp, environment.zombieBp));
             Human h = getClosestHuman();
             if (h != null) nc = nc.add(calculateNc(getClosestHuman().position, environment.entityAp, environment.entityBp));
 

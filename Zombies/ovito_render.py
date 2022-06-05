@@ -34,8 +34,8 @@ def animate():
 
     
     
-    vp.render_anim(size=(800, 800),
-                   filename="zombies.mp4", fps=15, background=(0, 0, 0), every_nth=1)
+    vp.render_anim(size=(800, 600),
+                   filename="zombies.mp4", fps=20, background=(0, 0, 0), every_nth=1)
     static.remove_from_scene()
     particles.remove_from_scene()
 

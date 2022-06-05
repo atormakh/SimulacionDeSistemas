@@ -5,11 +5,13 @@ public class Zombie extends Entity {
     boolean eating = false;
     boolean converting = false;
     double eatingTimeLeft;
+    boolean dead = false;
     Zombie food = null;
 
 
     public Zombie(double x, double y) {
         super(x, y);
+        type = 1;
         eatingTimeLeft = environment.eatingTime;
     }
 
@@ -19,7 +21,7 @@ public class Zombie extends Entity {
         Vec2 nc = new Vec2(0, 0);
 
         //check if converting
-        if (converting) return;
+        if (converting || dead) return;
 
         //check if eating
         if (eating) {
@@ -41,6 +43,13 @@ public class Zombie extends Entity {
         //set desired position to closest human
         if (h != null && dh < environment.zombieVision) {
             if (dh < h.r + r) { //if human is close enough to eat
+                if(Math.random() < environment.np){
+                    environment.killZombie(this);
+                    dead = true;
+                    type = 2;
+                    r = environment.rmin;
+                    return;
+                }
                 eating = true;
                 environment.removeHuman(h);
                 Zombie z = new Zombie(h.position.x, h.position.y);

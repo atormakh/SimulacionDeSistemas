@@ -2,6 +2,7 @@
 public class Human extends Entity {
     public Human(double x, double y) {
         super(x, y);
+        type = 0;
         desiredVelocity = environment.vh;
     }
 

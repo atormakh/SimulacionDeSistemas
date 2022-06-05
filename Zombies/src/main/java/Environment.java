@@ -16,29 +16,31 @@ public class Environment {
     double t = 0;
     double dt;
     double radius;
-    double entityAp = 300;
-    double entityBp = 0.15;
+    double entityAp = 2000;
+    double entityBp = 0.2;
     double wallAp = 500;
-    double wallBp = 0.3;
+    double wallBp = 0.4;
     double zombieAp = 3000;
-    double zombieBp = 0.3;
-    double rmin = 0.15;
-    double rmax = 0.32;
+    double zombieBp = 0.2;
+    double rmin = 0.2;
+    double rmax = 0.3;
     double beta = 0.9;
     double tau = 0.5;
 
     double eatingTime = 7;
     double zombieVision = 4;
+    double np;
     static Environment instance = null;
 
-    public Environment(double dt, double radius, double vz) {
+    public Environment(double dt, double radius, double vz, double np) {
         this.dt = dt;
         this.radius = radius;
         this.vz = vz;
+        this.np = np;
     }
 
-    public static Environment init(double dt, double radius, double vz) {
-        instance = new Environment(dt, radius, vz);
+    public static Environment init(double dt, double radius, double vz, double np) {
+        instance = new Environment(dt, radius, vz, np);
         return instance;
     }
 
@@ -49,10 +51,9 @@ public class Environment {
     public void printToFile(FileWriter out) throws IOException {
         out.write(t + " " + zombies.size() + " " + humans.size() + "\n");
         for (Entity entity : entities) {
-            int zombie = entity instanceof Zombie ? 1 : 0;
             out.write(entity.position.x + " " + entity.position.y
                     + " " + entity.desiredPos.x + " " + entity.desiredPos.y
-                    + " " + entity.r + " " + zombie + "\n");
+                    + " " + entity.r + " " +  entity.type + "\n");
         }
     }
 
@@ -78,8 +79,8 @@ public class Environment {
 
     }
 
-    public boolean areAllZombies(){
-        return entities.size() == zombies.size();
+    public boolean areAllSame(){
+        return zombies.size() == 0 || humans.size()==0;
     }
 
     private boolean isColliding(Entity entity) {
@@ -132,5 +133,9 @@ public class Environment {
     public Vec2 getClosestWall(Vec2 position) {
         if(position.x == 0 && position.y == 0) return new Vec2(radius,0);
         return position.normalize().mul(radius);
+    }
+
+    public void killZombie(Zombie zombie) {
+        zombies.remove(zombie);
     }
 }
