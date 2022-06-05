@@ -42,7 +42,7 @@ if __name__ == "__main__":
     parser.add_argument("-dt", "--timeStep", type=float,
                         default=1e-2, help="Time step for simulation")
     parser.add_argument("-outputDt", "--saveStep", type=float,
-                        default=5e-1, help="Time step for saving")
+                        default=2e-1, help="Time step for saving")
     parser.add_argument("-tf", "--maxTime", type=float, default=3*60,
                         help="Max time for simulation")
     parser.add_argument("-vz", "--zombieVelocity", type=float,

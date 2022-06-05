@@ -12,9 +12,9 @@ public class Main {
 
         double dt = Double.parseDouble(System.getProperty("dt", "1e-2"));
         double outputDt = Double.parseDouble(System.getProperty("outputDt", "2e-1"));
-        double tf = Double.parseDouble(System.getProperty("tf", "300"));
-        double vz = Double.parseDouble(System.getProperty("vz", "4"));
-        int Nh = Integer.parseInt(System.getProperty("nh", "260"));
+        double tf = Double.parseDouble(System.getProperty("tf", "180"));
+        double vz = Double.parseDouble(System.getProperty("vz", "3"));
+        int Nh = Integer.parseInt(System.getProperty("nh", "200"));
         double np = Double.parseDouble(System.getProperty("np", "0"));
         int frec = (int) (outputDt / dt);
         int recipientRadius = 11;

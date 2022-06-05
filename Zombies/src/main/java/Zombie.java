@@ -44,10 +44,13 @@ public class Zombie extends Entity {
         if (h != null && dh < environment.zombieVision) {
             if (dh < h.r + r) { //if human is close enough to eat
                 if(Math.random() < environment.np){
-                    environment.killZombie(this);
-                    dead = true;
-                    type = 2;
-                    r = environment.rmin;
+                    //environment.killZombie(this);
+                    //dead = true;
+                    //type = 2;
+                    //r = environment.rmin;
+                    environment.removeZombie(this);
+                    Human hu = new Human(position.x, position.y);
+                    environment.addHuman(hu);
                     return;
                 }
                 eating = true;
