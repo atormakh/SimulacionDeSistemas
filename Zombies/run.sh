@@ -1,5 +1,4 @@
-python3 runner.py -nh 10
-python3 runner.py -nh 100
-python3 runner.py -nh 300
-python3 runner.py -nh 10 -vz 5
-python3 runner.py -nh 100 -np 0.4
+python3 runner.py -nh 10 &
+python3 runner.py -nh 340 &
+python3 runner.py -nh 140 -vz 1 &
+python3 runner.py -nh 140 -vz 5.5 &

@@ -43,5 +43,6 @@ def animate():
 if __name__ == "__main__":
     import data_import, ovito_export
     data = data_import.Data("zombies.txt")
+    ovito_export.generate_wall()
     ovito_export.save("zombies.xyz", data)
     animate()
